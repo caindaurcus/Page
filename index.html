@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurcus Online | Wiki & Hub</title>
+    <title>Aurcus Online | Caind Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- FONDO OSCURO PARA CERRAR EL MENÚ -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- MENÚ LATERAL -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>AURCUS HUB</h2>
-            <!-- BOTÓN PARA CERRAR EL MENÚ -->
             <button class="close-btn" id="close-btn">&times;</button>
         </div>
         <ul class="sidebar-menu">
@@ -27,92 +24,83 @@
             <li><a href="#builds"><span class="menu-icon">✦</span> Mejores Builds</a></li>
         </ul>
         <div class="sidebar-footer">
-            <p>Versión 4.0 // Comunidad</p>
+            <div class="stats-box">
+                <p>Jugadores activos: <strong>1,248</strong></p>
+                <div class="live-indicator"></div>
+            </div>
+            <p style="margin-top:10px;">Versión 4.0 // Caind</p>
         </div>
     </nav>
 
-    <!-- BARRA SUPERIOR -->
     <header class="top-nav">
         <div class="menu-toggle" id="menu-btn">
             <div class="hamburger"></div>
         </div>
-        <div class="brand">
-            AURCUS <span class="brand-accent">WIKI</span>
-        </div>
+        <div class="brand">AURCUS <span class="brand-accent">WIKI</span></div>
         <div class="profile-icon">👤</div>
     </header>
 
-    <!-- SECCIÓN PRINCIPAL DE BIENVENIDA -->
+    <div class="news-ticker">
+        <span class="ticker-label">NEWS:</span>
+        <marquee>Bienvenido a Caind Hub v4.0 // Actualización de guías Gate 4 disponible // Mercado activo.</marquee>
+    </div>
+
     <main class="container">
         <section class="hero-section fade-in">
             <div class="hero-card">
                 <span class="badge">ACTUALIZADO 2026</span>
                 <h1>Bienvenido a tu<br><span class="text-gold">Guía Definitiva</span></h1>
-                <p>Explora las mejores estrategias, domina tu clase y descubre el mercado de Aurcus Online en un solo lugar.</p>
+                <p>Explora las mejores estrategias y domina el mercado de Aurcus Online.</p>
             </div>
         </section>
 
-        <!-- SECCIÓN DE CATEGORÍAS (TARJETAS NUEVAS) -->
+        <!-- Ejemplo de sección de Código -->
+        <div class="glass-card fade-in delay-1" id="code">
+            <h3>CÓDIGOS PROMOCIONALES</h3>
+            <div class="code-box">
+                <code>PROMO-AURCUS-2026</code>
+                <button onclick="copyCode('PROMO-AURCUS-2026')">COPIAR</button>
+            </div>
+        </div>
+
         <section class="grid-layout">
-            
-            <!-- Tarjeta 1: Gate 4 -->
-            <div class="glass-card fade-in delay-1">
+            <div class="glass-card fade-in delay-2">
                 <div class="card-header">
                     <div class="icon-box">⚔️</div>
                     <h3>Guía Gate 4</h3>
                 </div>
-                <p class="card-desc">Aprende los patrones de los jefes, mecánicas de supervivencia y formaciones de equipo para superar Gate 4 sin morir.</p>
+                <p class="card-desc">Estrategias, patrones y mecánicas para superar Gate 4.</p>
                 <a href="#helpgate" class="action-btn">Ver Estrategia</a>
             </div>
 
-            <!-- Tarjeta 2: Builds -->
-            <div class="glass-card fade-in delay-2">
+            <div class="glass-card fade-in delay-3">
                 <div class="card-header">
                     <div class="icon-box">🛡️</div>
                     <h3>Mejores Builds</h3>
                 </div>
-                <p class="card-desc">Desde Paladines inmortales hasta Asesinos letales. Encuentra la distribución perfecta de stats y equipamiento.</p>
+                <p class="card-desc">Optimiza tus stats con las builds más letales del meta.</p>
                 <a href="#builds" class="action-btn">Explorar Clases</a>
             </div>
-
-            <!-- Tarjeta 3: Mercado -->
-            <div class="glass-card fade-in delay-3">
-                <div class="card-header">
-                    <div class="icon-box">💰</div>
-                    <h3>Mercado & Seller</h3>
-                </div>
-                <p class="card-desc">Consulta precios actuales, contacta con vendedores verificados y aprende a tradear de forma segura.</p>
-                <a href="#seller" class="action-btn">Ir al Mercado</a>
-            </div>
-
         </section>
     </main>
 
-    <!-- LÓGICA DEL MENÚ (CERRAR Y ABRIR) -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
         const closeBtn = document.getElementById('close-btn');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
 
-        // Función para abrir el menú
-        function openMenu() {
-            sidebar.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Evita hacer scroll mientras el menú está abierto
-        }
+        function openMenu() { sidebar.classList.add('active'); overlay.classList.add('active'); }
+        function closeMenu() { sidebar.classList.remove('active'); overlay.classList.remove('active'); }
 
-        // Función para cerrar el menú
-        function closeMenu() {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = 'auto'; // Restaura el scroll
-        }
-
-        // Eventos de click
         menuBtn.addEventListener('click', openMenu);
         closeBtn.addEventListener('click', closeMenu);
-        overlay.addEventListener('click', closeMenu); // Cerrar al tocar lo oscuro
+        overlay.addEventListener('click', closeMenu);
+
+        function copyCode(code) {
+            navigator.clipboard.writeText(code);
+            alert("Código copiado: " + code);
+        }
     </script>
 </body>
 </html>
