@@ -3,103 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurcus Online | Caind Hub</title>
+    <title>Aurcus Hub | Caind</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="overlay" id="overlay"></div>
 
+    <!-- Menú Lateral -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>AURCUS HUB</h2>
             <button class="close-btn" id="close-btn">&times;</button>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#inicio"><span class="menu-icon">✦</span> Página Principal</a></li>
-            <li><a href="#venta"><span class="menu-icon">✦</span> Mercado y Ventas</a></li>
-            <li><a href="#code"><span class="menu-icon">✦</span> Códigos (Codes)</a></li>
-            <li><a href="#seller"><span class="menu-icon">✦</span> Vendedores Verificados</a></li>
-            <li><a href="#helpgate"><span class="menu-icon">✦</span> Guía Gate 4</a></li>
-            <li><a href="#builds"><span class="menu-icon">✦</span> Mejores Builds</a></li>
+            <li><a href="#" onclick="showPage('inicio')"><span class="menu-icon">✦</span> Página Principal</a></li>
+            <li><a href="#" onclick="showPage('venta')"><span class="menu-icon">✦</span> Mercado y Ventas</a></li>
+            <li><a href="#" onclick="showPage('code')"><span class="menu-icon">✦</span> Códigos (Codes)</a></li>
+            <li><a href="#" onclick="showPage('seller')"><span class="menu-icon">✦</span> Vendedores Verificados</a></li>
+            <li><a href="#" onclick="showPage('helpgate')"><span class="menu-icon">✦</span> Guía Gate 4</a></li>
+            <li><a href="#" onclick="showPage('builds')"><span class="menu-icon">✦</span> Mejores Builds</a></li>
         </ul>
-        <div class="sidebar-footer">
-            <div class="stats-box">
-                <p>Jugadores activos: <strong>1,248</strong></p>
-                <div class="live-indicator"></div>
-            </div>
-            <p style="margin-top:10px;">Versión 4.0 // Caind</p>
-        </div>
     </nav>
 
+    <!-- Barra Superior -->
     <header class="top-nav">
-        <div class="menu-toggle" id="menu-btn">
-            <div class="hamburger"></div>
-        </div>
+        <div class="menu-toggle" id="menu-btn"></div>
         <div class="brand">AURCUS <span class="brand-accent">WIKI</span></div>
         <div class="profile-icon">👤</div>
     </header>
 
-    <div class="news-ticker">
-        <span class="ticker-label">NEWS:</span>
-        <marquee>Bienvenido a Caind Hub v4.0 // Actualización de guías Gate 4 disponible // Mercado activo.</marquee>
-    </div>
-
     <main class="container">
-        <section class="hero-section fade-in">
-            <div class="hero-card">
-                <span class="badge">ACTUALIZADO 2026</span>
-                <h1>Bienvenido a tu<br><span class="text-gold">Guía Definitiva</span></h1>
-                <p>Explora las mejores estrategias y domina el mercado de Aurcus Online.</p>
-            </div>
-        </section>
+        <!-- INICIO -->
+        <div id="page-inicio" class="content-page">
+            <section class="hero-card">
+                <h1>Bienvenido, <span class="text-gold">Caind</span></h1>
+                <p>Tu hub central para Aurcus Online. Usa el menú superior para navegar.</p>
+            </section>
+        </div>
 
-        <!-- Ejemplo de sección de Código -->
-        <div class="glass-card fade-in delay-1" id="code">
-            <h3>CÓDIGOS PROMOCIONALES</h3>
+        <!-- VENTA -->
+        <div id="page-venta" class="content-page" style="display:none;">
+            <h1>Mercado y Ventas</h1>
+            <div class="glass-card"><p>Listado de items actuales y tendencias de mercado.</p></div>
+        </div>
+
+        <!-- CODES -->
+        <div id="page-code" class="content-page" style="display:none;">
+            <h1>Centro de Códigos</h1>
             <div class="code-box">
-                <code>PROMO-AURCUS-2026</code>
-                <button onclick="copyCode('PROMO-AURCUS-2026')">COPIAR</button>
+                <code>AURCUS-GIFT-2026</code>
+                <button onclick="copyCode('AURCUS-GIFT-2026')">COPIAR</button>
             </div>
         </div>
 
-        <section class="grid-layout">
-            <div class="glass-card fade-in delay-2">
-                <div class="card-header">
-                    <div class="icon-box">⚔️</div>
-                    <h3>Guía Gate 4</h3>
-                </div>
-                <p class="card-desc">Estrategias, patrones y mecánicas para superar Gate 4.</p>
-                <a href="#helpgate" class="action-btn">Ver Estrategia</a>
+        <!-- SELLER -->
+        <div id="page-seller" class="content-page" style="display:none;">
+            <h1>Vendedores Verificados</h1>
+            <div class="glass-card">
+                <p>Lista de vendedores confiables en el servidor.</p>
             </div>
+        </div>
 
-            <div class="glass-card fade-in delay-3">
-                <div class="card-header">
-                    <div class="icon-box">🛡️</div>
-                    <h3>Mejores Builds</h3>
-                </div>
-                <p class="card-desc">Optimiza tus stats con las builds más letales del meta.</p>
-                <a href="#builds" class="action-btn">Explorar Clases</a>
+        <!-- HELP GATE 4 -->
+        <div id="page-helpgate" class="content-page" style="display:none;">
+            <h1>Guía Gate 4</h1>
+            <div class="glass-card"><p>Estrategias avanzadas para el farm de jefes.</p></div>
+        </div>
+
+        <!-- BUILDS -->
+        <div id="page-builds" class="content-page" style="display:none;">
+            <h1>Mejores Builds</h1>
+            <div class="glass-card"><p>Distribución de puntos recomendada por clase.</p>
             </div>
-        </section>
+        </div>
     </main>
 
     <script>
+        // Lógica de Menú
         const menuBtn = document.getElementById('menu-btn');
         const closeBtn = document.getElementById('close-btn');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
 
-        function openMenu() { sidebar.classList.add('active'); overlay.classList.add('active'); }
-        function closeMenu() { sidebar.classList.remove('active'); overlay.classList.remove('active'); }
+        menuBtn.addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
+        closeBtn.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
 
-        menuBtn.addEventListener('click', openMenu);
-        closeBtn.addEventListener('click', closeMenu);
-        overlay.addEventListener('click', closeMenu);
+        // Lógica de Páginas
+        function showPage(pageId) {
+            document.querySelectorAll('.content-page').forEach(p => p.style.display = 'none');
+            document.getElementById('page-' + pageId).style.display = 'block';
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
 
         function copyCode(code) {
             navigator.clipboard.writeText(code);
-            alert("Código copiado: " + code);
+            alert("Copiado: " + code);
         }
     </script>
 </body>
