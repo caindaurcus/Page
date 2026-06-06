@@ -3,99 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caind // Aurcus Online Hub</title>
+    <title>Aurcus Online | Wiki & Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- FONDO OSCURO PARA CERRAR EL MENÚ -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- MENÚ LATERAL -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2><span class="bracket">[</span> MENÚ <span class="bracket">]</span></h2>
+            <h2>AURCUS HUB</h2>
+            <!-- BOTÓN PARA CERRAR EL MENÚ -->
+            <button class="close-btn" id="close-btn">&times;</button>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#inicio">Página Principal</a></li>
-            <li><a href="#venta">Página de Venta</a></li>
-            <li><a href="#code">Página de Code</a></li>
-            <li><a href="#seller">Página Seller</a></li>
-            <li><a href="#helpgate">Help Gate 4</a></li>
-            <li><a href="#builds">Best Builds</a></li>
+            <li><a href="#inicio"><span class="menu-icon">✦</span> Página Principal</a></li>
+            <li><a href="#venta"><span class="menu-icon">✦</span> Mercado y Ventas</a></li>
+            <li><a href="#code"><span class="menu-icon">✦</span> Códigos (Codes)</a></li>
+            <li><a href="#seller"><span class="menu-icon">✦</span> Vendedores Verificados</a></li>
+            <li><a href="#helpgate"><span class="menu-icon">✦</span> Guía Gate 4</a></li>
+            <li><a href="#builds"><span class="menu-icon">✦</span> Mejores Builds</a></li>
         </ul>
+        <div class="sidebar-footer">
+            <p>Versión 4.0 // Comunidad</p>
+        </div>
     </nav>
 
-    <header>
-        <div class="header-content">
-            <div class="menu-toggle" id="menu-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="logo">
-                <span class="bracket">[</span>
-                caindaurcus
-                <span class="bracket">]</span>
-            </div>
+    <!-- BARRA SUPERIOR -->
+    <header class="top-nav">
+        <div class="menu-toggle" id="menu-btn">
+            <div class="hamburger"></div>
         </div>
+        <div class="brand">
+            AURCUS <span class="brand-accent">WIKI</span>
+        </div>
+        <div class="profile-icon">👤</div>
     </header>
 
-    <section class="hero" id="inicio">
-        <div class="hero-content fade-in-up">
-            <h1>AURCUS <span class="highlight">ONLINE HUB</span></h1>
-            <p class="sub">Tu recurso definitivo para mercado, clases y estrategias.</p>
-            <div class="status">
-                <span class="dot"></span> SERVER ONLINE
+    <!-- SECCIÓN PRINCIPAL DE BIENVENIDA -->
+    <main class="container">
+        <section class="hero-section fade-in">
+            <div class="hero-card">
+                <span class="badge">ACTUALIZADO 2026</span>
+                <h1>Bienvenido a tu<br><span class="text-gold">Guía Definitiva</span></h1>
+                <p>Explora las mejores estrategias, domina tu clase y descubre el mercado de Aurcus Online en un solo lugar.</p>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="apps">
-
-        <div class="app-card fade-in-up" style="animation-delay: 0.2s;">
-            <div class="app-icon">⚔️</div>
-            <div class="app-info">
-                <h2>Help Gate 4</h2>
-                <p class="version">Actualizado :: Cooperativo</p>
-                <p class="desc">Estrategias avanzadas y mecánicas para dominar el farmeo de jefes en Gate 4. Encuentra grupos rápidos y efectivos.</p>
-                <div class="tags">
-                    <span class="tag">GUIDE</span>
-                    <span class="tag">PVE</span>
+        <!-- SECCIÓN DE CATEGORÍAS (TARJETAS NUEVAS) -->
+        <section class="grid-layout">
+            
+            <!-- Tarjeta 1: Gate 4 -->
+            <div class="glass-card fade-in delay-1">
+                <div class="card-header">
+                    <div class="icon-box">⚔️</div>
+                    <h3>Guía Gate 4</h3>
                 </div>
-                <a href="#helpgate" class="btn-download">
-                    ENTRAR A LA GUÍA
-                </a>
+                <p class="card-desc">Aprende los patrones de los jefes, mecánicas de supervivencia y formaciones de equipo para superar Gate 4 sin morir.</p>
+                <a href="#helpgate" class="action-btn">Ver Estrategia</a>
             </div>
-        </div>
 
-        <div class="app-card fade-in-up" style="animation-delay: 0.4s;">
-            <div class="app-icon">🛡️</div>
-            <div class="app-info">
-                <h2>Best Builds</h2>
-                <p class="version">Actualizado :: Todas las clases</p>
-                <p class="desc">Optimiza tus estadísticas y equipo. Descubre las construcciones de personajes más letales y resistentes del meta actual.</p>
-                <div class="tags">
-                    <span class="tag">STATS</span>
-                    <span class="tag">GEAR</span>
+            <!-- Tarjeta 2: Builds -->
+            <div class="glass-card fade-in delay-2">
+                <div class="card-header">
+                    <div class="icon-box">🛡️</div>
+                    <h3>Mejores Builds</h3>
                 </div>
-                <a href="#builds" class="btn-download">
-                    VER BUILDS
-                </a>
+                <p class="card-desc">Desde Paladines inmortales hasta Asesinos letales. Encuentra la distribución perfecta de stats y equipamiento.</p>
+                <a href="#builds" class="action-btn">Explorar Clases</a>
             </div>
-        </div>
 
-    </section>
+            <!-- Tarjeta 3: Mercado -->
+            <div class="glass-card fade-in delay-3">
+                <div class="card-header">
+                    <div class="icon-box">💰</div>
+                    <h3>Mercado & Seller</h3>
+                </div>
+                <p class="card-desc">Consulta precios actuales, contacta con vendedores verificados y aprende a tradear de forma segura.</p>
+                <a href="#seller" class="action-btn">Ir al Mercado</a>
+            </div>
 
-    <footer>
-        <p>// caindaurcus :: Hub Oficial</p>
-        <p class="footer-sub">Comunidad Aurcus Online</p>
-    </footer>
+        </section>
+    </main>
 
+    <!-- LÓGICA DEL MENÚ (CERRAR Y ABRIR) -->
     <script>
         const menuBtn = document.getElementById('menu-btn');
+        const closeBtn = document.getElementById('close-btn');
         const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
 
-        menuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            menuBtn.classList.toggle('active');
-        });
+        // Función para abrir el menú
+        function openMenu() {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Evita hacer scroll mientras el menú está abierto
+        }
+
+        // Función para cerrar el menú
+        function closeMenu() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restaura el scroll
+        }
+
+        // Eventos de click
+        menuBtn.addEventListener('click', openMenu);
+        closeBtn.addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu); // Cerrar al tocar lo oscuro
     </script>
 </body>
 </html>
