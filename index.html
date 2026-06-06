@@ -10,98 +10,82 @@
 
     <div class="overlay" id="overlay"></div>
 
-    <!-- Menú Lateral -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>AURCUS HUB</h2>
             <button class="close-btn" id="close-btn">&times;</button>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#" onclick="showPage('inicio')"><span class="menu-icon">✦</span> Página Principal</a></li>
-            <li><a href="#" onclick="showPage('venta')"><span class="menu-icon">✦</span> Mercado y Ventas</a></li>
-            <li><a href="#" onclick="showPage('code')"><span class="menu-icon">✦</span> Códigos (Codes)</a></li>
-            <li><a href="#" onclick="showPage('seller')"><span class="menu-icon">✦</span> Vendedores Verificados</a></li>
-            <li><a href="#" onclick="showPage('helpgate')"><span class="menu-icon">✦</span> Guía Gate 4</a></li>
-            <li><a href="#" onclick="showPage('builds')"><span class="menu-icon">✦</span> Mejores Builds</a></li>
+            <li><a href="#" onclick="showPage('inicio')"><span class="menu-icon">✦</span> <span data-lang="menu_home">Página Principal</span></a></li>
+            <li><a href="#" onclick="showPage('venta')"><span class="menu-icon">✦</span> <span data-lang="menu_sales">Mercado y Ventas</span></a></li>
+            <li><a href="#" onclick="showPage('code')"><span class="menu-icon">✦</span> <span data-lang="menu_code">Códigos (Codes)</span></a></li>
+            <li><a href="#" onclick="showPage('seller')"><span class="menu-icon">✦</span> <span data-lang="menu_seller">Vendedores Verificados</span></a></li>
         </ul>
+        <div class="sidebar-footer">
+            <div class="stats-box">
+                <p><span data-lang="players">Jugadores activos</span>: <strong>1,248</strong></p>
+                <div class="live-indicator"></div>
+            </div>
+            <p>Versión 4.0 // Caind</p>
+        </div>
     </nav>
 
-    <!-- Barra Superior -->
     <header class="top-nav">
         <div class="menu-toggle" id="menu-btn"></div>
         <div class="brand">AURCUS <span class="brand-accent">WIKI</span></div>
-        <div class="profile-icon">👤</div>
+        <select id="lang" onchange="changeLanguage()">
+            <option value="es">ES</option>
+            <option value="en">EN</option>
+        </select>
     </header>
 
+    <div class="news-ticker">
+        <span class="ticker-label">NEWS:</span>
+        <marquee data-lang="news">Bienvenido a Caind Hub v4.0 // Guías de Gate 4 actualizadas.</marquee>
+    </div>
+
     <main class="container">
-        <!-- INICIO -->
+        <!-- PÁGINA INICIO -->
         <div id="page-inicio" class="content-page">
             <section class="hero-card">
-                <h1>Bienvenido, <span class="text-gold">Caind</span></h1>
-                <p>Tu hub central para Aurcus Online. Usa el menú superior para navegar.</p>
+                <h1 data-lang="welcome_title">Bienvenido, Caind</h1>
+                <p data-lang="welcome_sub">Tu hub central para Aurcus Online.</p>
             </section>
-        </div>
-
-        <!-- VENTA -->
-        <div id="page-venta" class="content-page" style="display:none;">
-            <h1>Mercado y Ventas</h1>
-            <div class="glass-card"><p>Listado de items actuales y tendencias de mercado.</p></div>
-        </div>
-
-        <!-- CODES -->
-        <div id="page-code" class="content-page" style="display:none;">
-            <h1>Centro de Códigos</h1>
-            <div class="code-box">
-                <code>AURCUS-GIFT-2026</code>
-                <button onclick="copyCode('AURCUS-GIFT-2026')">COPIAR</button>
+            <!-- Log de Actividad -->
+            <div class="terminal-log">
+                <div class="log-line">> System initialized...</div>
+                <div class="log-line">> Connection established.</div>
             </div>
         </div>
 
-        <!-- SELLER -->
-        <div id="page-seller" class="content-page" style="display:none;">
-            <h1>Vendedores Verificados</h1>
-            <div class="glass-card">
-                <p>Lista de vendedores confiables en el servidor.</p>
-            </div>
-        </div>
-
-        <!-- HELP GATE 4 -->
-        <div id="page-helpgate" class="content-page" style="display:none;">
-            <h1>Guía Gate 4</h1>
-            <div class="glass-card"><p>Estrategias avanzadas para el farm de jefes.</p></div>
-        </div>
-
-        <!-- BUILDS -->
-        <div id="page-builds" class="content-page" style="display:none;">
-            <h1>Mejores Builds</h1>
-            <div class="glass-card"><p>Distribución de puntos recomendada por clase.</p>
-            </div>
-        </div>
+        <!-- OTRAS PÁGINAS (CONTENIDO OCULTO POR DEFECTO) -->
+        <div id="page-venta" class="content-page" style="display:none;"><h1 data-lang="menu_sales">Mercado y Ventas</h1><div class="glass-card"><p>Contenido de mercado aquí...</p></div></div>
+        <div id="page-code" class="content-page" style="display:none;"><h1 data-lang="menu_code">Centro de Códigos</h1><div class="code-box"><code>AURCUS-2026</code><button onclick="copyCode('AURCUS-2026')">COPIAR</button></div></div>
+        <div id="page-seller" class="content-page" style="display:none;"><h1 data-lang="menu_seller">Vendedores Verificados</h1><div class="glass-card"><p>Lista de confianza...</p></div></div>
     </main>
 
     <script>
-        // Lógica de Menú
-        const menuBtn = document.getElementById('menu-btn');
-        const closeBtn = document.getElementById('close-btn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
+        const translations = {
+            es: { "menu_home": "Página Principal", "menu_sales": "Mercado y Ventas", "menu_code": "Códigos (Codes)", "menu_seller": "Vendedores Verificados", "players": "Jugadores activos", "news": "Bienvenido a Caind Hub v4.0", "welcome_title": "Bienvenido, Caind", "welcome_sub": "Tu hub central para Aurcus Online." },
+            en: { "menu_home": "Home", "menu_sales": "Market & Sales", "menu_code": "Codes", "menu_seller": "Verified Sellers", "players": "Active players", "news": "Welcome to Caind Hub v4.0", "welcome_title": "Welcome, Caind", "welcome_sub": "Your central hub for Aurcus Online." }
+        };
 
-        menuBtn.addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
-        closeBtn.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
-        overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+        function changeLanguage() {
+            const lang = document.getElementById('lang').value;
+            document.querySelectorAll('[data-lang]').forEach(el => { el.textContent = translations[lang][el.getAttribute('data-lang')]; });
+        }
 
-        // Lógica de Páginas
         function showPage(pageId) {
             document.querySelectorAll('.content-page').forEach(p => p.style.display = 'none');
             document.getElementById('page-' + pageId).style.display = 'block';
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
         }
 
-        function copyCode(code) {
-            navigator.clipboard.writeText(code);
-            alert("Copiado: " + code);
-        }
+        // Lógica de menús y copiado
+        document.getElementById('menu-btn').addEventListener('click', () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); });
+        document.getElementById('close-btn').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); });
+        function copyCode(c) { navigator.clipboard.writeText(c); alert("Copiado: " + c); }
     </script>
 </body>
 </html>
