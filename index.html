@@ -3,60 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>caindaurcus // Apps</title>
+    <title>Caind // Aurcus Online Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><span class="bracket">[</span> MENÚ <span class="bracket">]</span></h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#inicio">Página Principal</a></li>
+            <li><a href="#venta">Página de Venta</a></li>
+            <li><a href="#code">Página de Code</a></li>
+            <li><a href="#seller">Página Seller</a></li>
+            <li><a href="#helpgate">Help Gate 4</a></li>
+            <li><a href="#builds">Best Builds</a></li>
+        </ul>
+    </nav>
+
     <header>
         <div class="header-content">
+            <div class="menu-toggle" id="menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <div class="logo">
                 <span class="bracket">[</span>
                 caindaurcus
                 <span class="bracket">]</span>
             </div>
-            <p class="tagline">// Android Apps & Tools</p>
         </div>
     </header>
 
-    <section class="hero">
-        <h1>APP <span class="highlight">DOWNLOADS</span></h1>
-        <p class="sub">Aplicaciones desarrolladas para Android</p>
-        <div class="status">
-            <span class="dot"></span> SYSTEM ONLINE
+    <section class="hero" id="inicio">
+        <div class="hero-content fade-in-up">
+            <h1>AURCUS <span class="highlight">ONLINE HUB</span></h1>
+            <p class="sub">Tu recurso definitivo para mercado, clases y estrategias.</p>
+            <div class="status">
+                <span class="dot"></span> SERVER ONLINE
+            </div>
         </div>
     </section>
 
     <section class="apps">
 
-        <div class="app-card">
-            <div class="app-icon">📱</div>
+        <div class="app-card fade-in-up" style="animation-delay: 0.2s;">
+            <div class="app-icon">⚔️</div>
             <div class="app-info">
-                <h2>App Viewer</h2>
-                <p class="version">v1.0 :: Android 5.0+</p>
-                <p class="desc">Visualizador oficial de contenido. Acceso a página web con sistema de usuarios.</p>
+                <h2>Help Gate 4</h2>
+                <p class="version">Actualizado :: Cooperativo</p>
+                <p class="desc">Estrategias avanzadas y mecánicas para dominar el farmeo de jefes en Gate 4. Encuentra grupos rápidos y efectivos.</p>
                 <div class="tags">
-                    <span class="tag">FREE</span>
-                    <span class="tag">ANDROID</span>
+                    <span class="tag">GUIDE</span>
+                    <span class="tag">PVE</span>
                 </div>
-                <a href="#" class="btn-download">
-                    ⬇ DOWNLOAD APK
+                <a href="#helpgate" class="btn-download">
+                    ENTRAR A LA GUÍA
                 </a>
             </div>
         </div>
 
-        <div class="app-card">
-            <div class="app-icon">🎵</div>
+        <div class="app-card fade-in-up" style="animation-delay: 0.4s;">
+            <div class="app-icon">🛡️</div>
             <div class="app-info">
-                <h2>Floating Player</h2>
-                <p class="version">v1.0 :: Android 8.0+</p>
-                <p class="desc">Reproductor de música flotante con controles desde cualquier pantalla.</p>
+                <h2>Best Builds</h2>
+                <p class="version">Actualizado :: Todas las clases</p>
+                <p class="desc">Optimiza tus estadísticas y equipo. Descubre las construcciones de personajes más letales y resistentes del meta actual.</p>
                 <div class="tags">
-                    <span class="tag">FREE</span>
-                    <span class="tag">ANDROID</span>
+                    <span class="tag">STATS</span>
+                    <span class="tag">GEAR</span>
                 </div>
-                <a href="#" class="btn-download">
-                    ⬇ DOWNLOAD APK
+                <a href="#builds" class="btn-download">
+                    VER BUILDS
                 </a>
             </div>
         </div>
@@ -64,9 +84,18 @@
     </section>
 
     <footer>
-        <p>// caindaurcus :: 2026</p>
-        <p class="footer-sub">Built with Android SDK</p>
+        <p>// caindaurcus :: Hub Oficial</p>
+        <p class="footer-sub">Comunidad Aurcus Online</p>
     </footer>
 
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            menuBtn.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
