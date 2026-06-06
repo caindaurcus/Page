@@ -8,18 +8,99 @@ body {
     background-color: #050d18;
     color: #c9d6e3;
     font-family: 'Courier New', monospace;
+    overflow-x: hidden; /* Evita scroll horizontal con el menú */
 }
 
-/* HEADER */
+/* --- MENÚ LATERAL OCULTO --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Oculto fuera de la pantalla */
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0a1628 0%, #050d18 100%);
+    border-right: 1px solid #00aaff;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 5px 0 15px rgba(0, 170, 255, 0.1);
+}
+
+.sidebar.active {
+    left: 0; /* Desliza hacia adentro */
+}
+
+.sidebar-header {
+    padding: 30px 24px;
+    border-bottom: 1px solid #1a3a5c;
+}
+
+.sidebar-header h2 {
+    color: #00aaff;
+    font-size: 20px;
+    letter-spacing: 2px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 20px 0;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 15px 24px;
+    color: #7a9bbc;
+    text-decoration: none;
+    font-size: 14px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #0a1e33;
+    transition: all 0.3s;
+}
+
+.sidebar-menu li a:hover {
+    background: #003d6b;
+    color: #00aaff;
+    padding-left: 30px; /* Efecto de empuje al pasar el cursor */
+    border-left: 4px solid #00aaff;
+}
+
+/* --- BOTÓN HAMBURGUESA --- */
+.menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.menu-toggle span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: #00aaff;
+    transition: all 0.3s ease;
+}
+
+.menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+.menu-toggle.active span:nth-child(2) { opacity: 0; }
+.menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+/* --- HEADER --- */
 header {
     background: linear-gradient(180deg, #0a1628 0%, #050d18 100%);
     border-bottom: 1px solid #1a3a5c;
     padding: 20px 24px;
+    position: relative;
+    z-index: 900;
 }
 
 .header-content {
     max-width: 800px;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .logo {
@@ -29,27 +110,23 @@ header {
     letter-spacing: 2px;
 }
 
-.bracket {
-    color: #0066cc;
-}
+.bracket { color: #0066cc; }
 
-.tagline {
-    color: #1a5c8a;
-    font-size: 12px;
-    margin-top: 4px;
-    letter-spacing: 1px;
-}
-
-/* HERO */
+/* --- HERO (SECCIÓN PRINCIPAL) --- */
 .hero {
     text-align: center;
-    padding: 48px 24px 32px;
-    background: linear-gradient(180deg, #050d18 0%, #071525 100%);
+    padding: 80px 24px 60px;
+    /* AQUÍ PUEDES PONER TU IMAGEN DE FONDO */
+    background: linear-gradient(180deg, rgba(5, 13, 24, 0.8) 0%, #071525 100%), url('fondo_aurcus.jpg') center/cover;
     border-bottom: 1px solid #1a3a5c;
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero h1 {
-    font-size: 36px;
+    font-size: 42px;
     color: #c9d6e3;
     letter-spacing: 4px;
     margin-bottom: 12px;
@@ -57,14 +134,14 @@ header {
 
 .highlight {
     color: #00aaff;
-    text-shadow: 0 0 20px #00aaff66;
+    text-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
 }
 
 .sub {
     color: #3a7abd;
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 1px;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
 }
 
 .status {
@@ -73,10 +150,11 @@ header {
     gap: 8px;
     background: #071525;
     border: 1px solid #1a3a5c;
-    padding: 6px 16px;
+    padding: 8px 20px;
     font-size: 12px;
     color: #00ff88;
     letter-spacing: 2px;
+    border-radius: 4px;
 }
 
 .dot {
@@ -85,6 +163,7 @@ header {
     background: #00ff88;
     border-radius: 50%;
     animation: pulse 1.5s infinite;
+    box-shadow: 0 0 8px #00ff88;
 }
 
 @keyframes pulse {
@@ -92,14 +171,28 @@ header {
     50% { opacity: 0.3; }
 }
 
-/* APPS */
+/* --- ANIMACIÓN FADE IN UP --- */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- TARJETAS --- */
 .apps {
     max-width: 800px;
     margin: 0 auto;
-    padding: 32px 16px;
+    padding: 40px 16px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
 }
 
 .app-card {
@@ -108,26 +201,28 @@ header {
     padding: 24px;
     display: flex;
     gap: 20px;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
+    border-radius: 4px;
 }
 
 .app-card:hover {
     border-color: #00aaff;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
 }
 
 .app-icon {
     font-size: 48px;
     min-width: 60px;
     text-align: center;
+    text-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
 }
 
-.app-info {
-    flex: 1;
-}
+.app-info { flex: 1; }
 
 .app-info h2 {
     color: #00aaff;
-    font-size: 18px;
+    font-size: 20px;
     letter-spacing: 1px;
     margin-bottom: 4px;
 }
@@ -136,20 +231,20 @@ header {
     color: #1a5c8a;
     font-size: 11px;
     letter-spacing: 1px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .desc {
     color: #7a9bbc;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.6;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
 }
 
 .tags {
     display: flex;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .tag {
@@ -157,8 +252,9 @@ header {
     border: 1px solid #1a3a5c;
     color: #3a7abd;
     font-size: 10px;
-    padding: 3px 10px;
+    padding: 4px 12px;
     letter-spacing: 1px;
+    border-radius: 2px;
 }
 
 .btn-download {
@@ -167,21 +263,24 @@ header {
     border: 1px solid #00aaff;
     color: #00aaff;
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-size: 13px;
     letter-spacing: 2px;
     transition: all 0.3s;
+    border-radius: 2px;
+    font-weight: bold;
 }
 
 .btn-download:hover {
     background: #00aaff;
     color: #050d18;
+    box-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
 }
 
-/* FOOTER */
+/* --- FOOTER --- */
 footer {
     text-align: center;
-    padding: 32px 24px;
+    padding: 40px 24px;
     border-top: 1px solid #1a3a5c;
     color: #1a5c8a;
     font-size: 12px;
@@ -189,6 +288,6 @@ footer {
 }
 
 .footer-sub {
-    margin-top: 6px;
+    margin-top: 8px;
     color: #0d2d45;
 }
