@@ -1,1 +1,22 @@
-<!-- Nuevo archivo -->
+/* Para Tablets (Pantallas hasta 768px) */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .sidebar {
+        width: 100%; /* El menú ocupa toda la pantalla en móvil */
+        left: -100%;
+    }
+}
+
+/* Para PC/Monitores grandes (Pantallas desde 1024px) */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1000px;
+    }
+
+    .glass-card {
+        padding: 30px;
+    }
+}
