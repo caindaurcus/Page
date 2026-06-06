@@ -1,293 +1,317 @@
+/* --- VARIABLES DE COLOR (TEMA FANTASÍA PREMIUM) --- */
+:root {
+    --bg-main: #0d0f12;
+    --bg-card: #181b21;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --gold-accent: #f5b041;
+    --gold-hover: #f39c12;
+    --border-color: #2a2e37;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    background-color: #050d18;
-    color: #c9d6e3;
-    font-family: 'Courier New', monospace;
-    overflow-x: hidden; /* Evita scroll horizontal con el menú */
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* --- MENÚ LATERAL OCULTO --- */
+/* --- OVERLAY (FONDO OSCURO AL ABRIR EL MENÚ) --- */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px); /* Desenfoque tipo iOS */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 998;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- MENÚ LATERAL --- */
 .sidebar {
     position: fixed;
     top: 0;
-    left: -280px; /* Oculto fuera de la pantalla */
+    left: -300px;
     width: 280px;
     height: 100vh;
-    background: linear-gradient(180deg, #0a1628 0%, #050d18 100%);
-    border-right: 1px solid #00aaff;
-    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
-    box-shadow: 5px 0 15px rgba(0, 170, 255, 0.1);
+    background-color: var(--bg-card);
+    box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+    transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar.active {
-    left: 0; /* Desliza hacia adentro */
+    left: 0;
 }
 
 .sidebar-header {
-    padding: 30px 24px;
-    border-bottom: 1px solid #1a3a5c;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-header h2 {
-    color: #00aaff;
-    font-size: 20px;
-    letter-spacing: 2px;
+    color: var(--gold-accent);
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+/* BOTÓN DE CERRAR LA BARRA LATERAL */
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 32px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #ff4d4d;
 }
 
 .sidebar-menu {
     list-style: none;
     padding: 20px 0;
+    flex-grow: 1;
 }
 
 .sidebar-menu li a {
-    display: block;
-    padding: 15px 24px;
-    color: #7a9bbc;
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    color: var(--text-main);
     text-decoration: none;
+    font-size: 15px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.menu-icon {
+    color: var(--gold-accent);
+    margin-right: 12px;
     font-size: 14px;
-    letter-spacing: 1px;
-    border-bottom: 1px solid #0a1e33;
-    transition: all 0.3s;
 }
 
 .sidebar-menu li a:hover {
-    background: #003d6b;
-    color: #00aaff;
-    padding-left: 30px; /* Efecto de empuje al pasar el cursor */
-    border-left: 4px solid #00aaff;
+    background: rgba(245, 176, 65, 0.1);
+    color: var(--gold-accent);
+    border-right: 4px solid var(--gold-accent);
 }
 
-/* --- BOTÓN HAMBURGUESA --- */
-.menu-toggle {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 30px;
-    height: 20px;
-    cursor: pointer;
-    z-index: 1001;
-}
-
-.menu-toggle span {
-    display: block;
-    height: 2px;
-    width: 100%;
-    background-color: #00aaff;
-    transition: all 0.3s ease;
-}
-
-.menu-toggle.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
-.menu-toggle.active span:nth-child(2) { opacity: 0; }
-.menu-toggle.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
-
-/* --- HEADER --- */
-header {
-    background: linear-gradient(180deg, #0a1628 0%, #050d18 100%);
-    border-bottom: 1px solid #1a3a5c;
-    padding: 20px 24px;
-    position: relative;
-    z-index: 900;
-}
-
-.header-content {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.logo {
-    font-size: 22px;
-    font-weight: bold;
-    color: #00aaff;
-    letter-spacing: 2px;
-}
-
-.bracket { color: #0066cc; }
-
-/* --- HERO (SECCIÓN PRINCIPAL) --- */
-.hero {
+.sidebar-footer {
+    padding: 20px;
     text-align: center;
-    padding: 80px 24px 60px;
-    /* AQUÍ PUEDES PONER TU IMAGEN DE FONDO */
-    background: linear-gradient(180deg, rgba(5, 13, 24, 0.8) 0%, #071525 100%), url('fondo_aurcus.jpg') center/cover;
-    border-bottom: 1px solid #1a3a5c;
-    min-height: 40vh;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- NAVEGACIÓN SUPERIOR --- */
+.top-nav {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
+    padding: 15px 20px;
+    background-color: rgba(13, 15, 18, 0.95);
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.hero h1 {
-    font-size: 42px;
-    color: #c9d6e3;
-    letter-spacing: 4px;
-    margin-bottom: 12px;
+.menu-toggle {
+    cursor: pointer;
+    padding: 5px;
 }
 
-.highlight {
-    color: #00aaff;
-    text-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
+.hamburger {
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-main);
+    position: relative;
 }
 
-.sub {
-    color: #3a7abd;
-    font-size: 14px;
+.hamburger::before, .hamburger::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-main);
+}
+
+.hamburger::before { top: -7px; }
+.hamburger::after { top: 7px; }
+
+.brand {
+    font-size: 18px;
+    font-weight: bold;
     letter-spacing: 1px;
+}
+
+.brand-accent {
+    color: var(--gold-accent);
+}
+
+.profile-icon {
+    font-size: 20px;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* --- TARJETA DE BIENVENIDA (HERO) --- */
+.hero-section {
     margin-bottom: 30px;
 }
 
-.status {
-    display: inline-flex;
+.hero-card {
+    background: linear-gradient(135deg, #1e222a 0%, #111317 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 40px 25px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge {
+    background: rgba(245, 176, 65, 0.15);
+    color: var(--gold-accent);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.hero-card h1 {
+    font-size: 28px;
+    line-height: 1.3;
+    margin-bottom: 15px;
+}
+
+.text-gold {
+    color: var(--gold-accent);
+}
+
+.hero-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* --- CUADRÍCULA DE TARJETAS (NUEVO DISEÑO) --- */
+.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding-bottom: 40px;
+}
+
+.glass-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    border-color: rgba(245, 176, 65, 0.3);
+}
+
+.card-header {
+    display: flex;
     align-items: center;
-    gap: 8px;
-    background: #071525;
-    border: 1px solid #1a3a5c;
-    padding: 8px 20px;
-    font-size: 12px;
-    color: #00ff88;
-    letter-spacing: 2px;
-    border-radius: 4px;
+    margin-bottom: 15px;
 }
 
-.dot {
-    width: 8px;
-    height: 8px;
-    background: #00ff88;
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-    box-shadow: 0 0 8px #00ff88;
+.icon-box {
+    width: 45px;
+    height: 45px;
+    background: rgba(245, 176, 65, 0.1);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    margin-right: 15px;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+.glass-card h3 {
+    font-size: 18px;
+    color: var(--text-main);
 }
 
-/* --- ANIMACIÓN FADE IN UP --- */
-.fade-in-up {
+.card-desc {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: var(--gold-accent);
+    color: #000;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.action-btn:hover {
+    background-color: var(--gold-hover);
+}
+
+/* --- ANIMACIONES GLOBALES --- */
+.fade-in {
     opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards;
 }
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
 
 @keyframes fadeInUp {
     to {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-/* --- TARJETAS --- */
-.apps {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.app-card {
-    background: #071525;
-    border: 1px solid #1a3a5c;
-    padding: 24px;
-    display: flex;
-    gap: 20px;
-    transition: all 0.3s;
-    border-radius: 4px;
-}
-
-.app-card:hover {
-    border-color: #00aaff;
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-}
-
-.app-icon {
-    font-size: 48px;
-    min-width: 60px;
-    text-align: center;
-    text-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
-}
-
-.app-info { flex: 1; }
-
-.app-info h2 {
-    color: #00aaff;
-    font-size: 20px;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-}
-
-.version {
-    color: #1a5c8a;
-    font-size: 11px;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-}
-
-.desc {
-    color: #7a9bbc;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 18px;
-}
-
-.tags {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.tag {
-    background: #0a1e33;
-    border: 1px solid #1a3a5c;
-    color: #3a7abd;
-    font-size: 10px;
-    padding: 4px 12px;
-    letter-spacing: 1px;
-    border-radius: 2px;
-}
-
-.btn-download {
-    display: inline-block;
-    background: linear-gradient(135deg, #003d6b 0%, #005fa3 100%);
-    border: 1px solid #00aaff;
-    color: #00aaff;
-    text-decoration: none;
-    padding: 12px 24px;
-    font-size: 13px;
-    letter-spacing: 2px;
-    transition: all 0.3s;
-    border-radius: 2px;
-    font-weight: bold;
-}
-
-.btn-download:hover {
-    background: #00aaff;
-    color: #050d18;
-    box-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
-}
-
-/* --- FOOTER --- */
-footer {
-    text-align: center;
-    padding: 40px 24px;
-    border-top: 1px solid #1a3a5c;
-    color: #1a5c8a;
-    font-size: 12px;
-    letter-spacing: 1px;
-}
-
-.footer-sub {
-    margin-top: 8px;
-    color: #0d2d45;
 }
