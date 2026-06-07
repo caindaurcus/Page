@@ -3,55 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurcus Hub | Caind</title>
-    
-    <!-- Estilos -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="responsive.css">
-    
-    <!-- Fuentes -->
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+    <title>Aurcus Online Community</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
-    <!-- Overlay para cerrar menú -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- Navegación Lateral -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h2>AURCUS HUB</h2>
-            <button class="close-btn" id="close-btn">&times;</button>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-logo">
+            <span class="logo-bracket">⚔</span>
+            <span class="logo-text">AURCUS</span>
+            <span class="logo-sub">ONLINE</span>
         </div>
-        <ul class="sidebar-menu" id="menu-items">
-            <!-- Los items del menú se generan dinámicamente en app.js -->
-        </ul>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </nav>
 
-    <!-- Barra Superior -->
-    <header class="top-nav">
-        <div class="menu-toggle" id="menu-btn"></div>
-        <div class="brand">AURCUS <span class="brand-accent">WIKI</span></div>
-        <select id="lang" onchange="changeLanguage()">
-            <option value="es">ES</option>
-            <option value="en">EN</option>
-        </select>
-    </header>
-
-    <!-- Noticia en tiempo real -->
-    <div class="news-ticker">
-        <span class="ticker-label">NEWS:</span>
-        <marquee>Bienvenido a Caind Hub v4.0 // Guías de Gate 4 disponibles // Mercado activo.</marquee>
+    <!-- MENÚ LATERAL -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <span>⚔ AURCUS MENU</span>
+            <button onclick="toggleMenu()">✕</button>
+        </div>
+        <ul class="menu-list">
+            <li><a href="#help-gate">🏰 Help Gate</a></li>
+            <li><a href="#seller">💰 Seller</a></li>
+            <li><a href="#market">🏪 Market</a></li>
+            <li><a href="#info-build">⚙️ Info Build</a></li>
+            <li><a href="#reliable-seller">✅ Reliable Seller</a></li>
+            <li><a href="#events">🎯 Events</a></li>
+            <li><a href="#rankings">🏆 Rankings</a></li>
+            <li><a href="#guides">📖 Guides</a></li>
+        </ul>
+        <div class="menu-footer">
+            <span>ES</span>
+            <span class="lang-sep">|</span>
+            <span>EN</span>
+        </div>
     </div>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-    <!-- Área de Contenido Principal -->
-    <main class="container" id="content-area">
-        <!-- El contenido se inyecta mediante app.js -->
-    </main>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <p class="hero-tag">// COMMUNITY HUB</p>
+            <h1>AURCUS <span class="highlight">ONLINE</span></h1>
+            <p class="hero-sub">
+                Tu comunidad oficial para traders, builders y hunters
+                <br>
+                <em>Your official community for traders, builders & hunters</em>
+            </p>
+            <div class="hero-status">
+                <span class="dot"></span>
+                <span>SERVIDOR ACTIVO / SERVER ONLINE</span>
+            </div>
+        </div>
+    </section>
 
-    <!-- Scripts -->
-    <script src="data.js"></script>
-    <script src="app.js"></script>
-    
+    <!-- SECCIONES -->
+
+    <!-- HELP GATE -->
+    <section class="section" id="help-gate">
+        <div class="section-header">
+            <span class="section-icon">🏰</span>
+            <div>
+                <h2>Help Gate</h2>
+                <p class="section-sub">Ayuda para nuevos jugadores / Help for new players</p>
+            </div>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <h3>🗺️ Guía de inicio</h3>
+                <p>Todo lo que necesitas saber para comenzar tu aventura en Aurcus Online.</p>
+                <p class="en">Everything you need to know to start your adventure.</p>
+                <a href="#" class="btn-card">Ver guía / View guide</a>
+            </div>
+            <div class="card">
+                <h3>❓ FAQ</h3>
+                <p>Preguntas frecuentes de la comunidad respondidas.</p>
+                <p class="en">Frequently asked community questions answered.</p>
+                <a href="#" class="btn-card">Ver FAQ</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SELLER -->
+    <section class="section dark" id="seller">
+        <div class="section-header">
+            <span class="section-icon">💰</span>
+            <div>
+                <h2>Seller</h2>
+                <p class="section-sub">Vende tus items / Sell your items</p>
+            </div>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <h3>📦 Publicar item</h3>
+                <p>¿Tienes algo para vender? Publícalo aquí para que la comunidad lo vea.</p>
+                <p class="en">Have something to sell? Post it here for the community.</p>
+                <a href="#" class="btn-card">Publicar / Post</a>
+            </div>
+            <div class="card">
+                <h3>📋 Lista de ventas</h3>
+                <p>Explora todos los items disponibles para comprar en la comunidad.</p>
+                <p class="en">Browse all items available for purchase.</p>
+                <a href="#" class="btn-card">Ver lista / View list</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- MARKET -->
+    <section class="section" id="market">
+        <div class="section-header">
+            <span class="section-icon">🏪</span>
+            <div>
+                <h2>Market</h2>
+                <p class="section-sub">Precios del mercado / Market prices</p>
+            </div>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <h3>📊 Precios actuales</h3>
+                <p>Consulta los precios actualizados de los items más populares.</p>
+                <p class="en">Check updated prices for the most popular items.</p>
+                <a href="#" class="btn-card">Ver precios / View prices</a>
+            </div>
+            <div class="card">
+                <h3>📈 Historial</h3>
+                <p>Revisa el historial de precios para hacer mejores tratos.</p>
+                <p class="en">Check price history to make better deals.</p>
+                <a href="#" class="btn-card">Ver historial / View history</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFO BUILD -->
+    <section class="section dark" id="info-build">
+        <div class="section-header">
+            <span class="section-icon">⚙️</span>
+            <div>
+                <h2>Info Build</h2>
+                <p class="section-sub">Builds y configuraciones / Builds & configurations</p>
+            </div>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <h3>⚔️ Builds PvP</h3>
+                <p>Las mejores configuraciones para dominar en combate jugador vs jugador.</p>
+                <p class="en">Best configurations to dominate in player vs player combat.</p>
+                <a href="#" class="btn-card">Ver builds / View builds</a>
+            </div>
+            <div class="card">
+                <h3>🛡️ Builds PvE</h3>
+                <p>Configuraciones optimizadas para farming y dungeons.</p>
+                <p class="en">Optimized configurations for farming and dungeons.</p>
+                <a href="#" class="btn-card">Ver builds / View builds</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- RELIABLE SELLER -->
+    <section class="section" id="reliable-seller">
+        <div class="section-header">
+            <span class="section-icon">✅</span>
+            <div>
+                <h2>Reliable Seller</h2>
+                <p class="section-sub">Vendedores de confianza / Trusted sellers</p>
+            </div>
+        </div>
+        <div class="sellers">
+            <div class="seller-card">
+                <div class="seller-badge">⭐ TOP</div>
+                <div class="seller-info">
+                    <h3>Vendedor #1</h3>
+                    <p>100+ transacciones exitosas</p>
+                    <p class="en">100+ successful transactions</p>
+                </div>
+                <span class="seller-status active">ACTIVO</span>
+            </div>
+            <div class="seller-card">
+                <div class="seller-badge">✅ VERIFIED</div>
+                <div class="seller-info">
+                    <h3>Vendedor #2</h3>
+                    <p>50+ transacciones exitosas</p>
+                    <p class="en">50+ successful transactions</p>
+                </div>
+                <span class="seller-status active">ACTIVO</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section class="section dark" id="events">
+        <div class="section-header">
+            <span class="section-icon">🎯</span>
+            <div>
+                <h2>Events</h2>
+                <p class="section-sub">Eventos de la comunidad / Community events</p>
+            </div>
+        </div>
+        <div class="cards">
+            <div class="card highlight-card">
+                <div class="event-badge">PRÓXIMO / UPCOMING</div>
+                <h3>🏆 Torneo PvP</h3>
+                <p>Próximamente — detalles por confirmar.</p>
+                <p class="en">Coming soon — details to be confirmed.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- RANKINGS -->
+    <section class="section" id="rankings">
+        <div class="section-header">
+            <span class="section-icon">🏆</span>
+            <div>
+                <h2>Rankings</h2>
+                <p class="section-sub">Los mejores jugadores / Top players</p>
+            </div>
+        </div>
+        <div class="ranking-list">
+            <div class="ranking-item">
+                <span class="rank gold">#1</span>
+                <span class="rank-name">Jugador #1</span>
+                <span class="rank-score">99,999 pts</span>
+            </div>
+            <div class="ranking-item">
+                <span class="rank silver">#2</span>
+                <span class="rank-name">Jugador #2</span>
+                <span class="rank-score">85,000 pts</span>
+            </div>
+            <div class="ranking-item">
+                <span class="rank bronze">#3</span>
+                <span class="rank-name">Jugador #3</span>
+                <span class="rank-score">72,000 pts</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p class="footer-logo">⚔ AURCUS ONLINE</p>
+        <p class="footer-sub">Comunidad no oficial / Unofficial community</p>
+        <p class="footer-copy">// caindaurcus :: 2026</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById('sideMenu');
+            var overlay = document.getElementById('overlay');
+            menu.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+    </script>
+
 </body>
 </html>
