@@ -110,6 +110,83 @@
     }
     .market-cta a { color: var(--cyan); text-decoration: none; }
 
+    /* MARKET — publish modal */
+    .market-publish-btn {
+      display: block; width: 100%; margin-bottom: 20px;
+      padding: 12px; background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(0,229,255,0.06));
+      border: 1px dashed var(--border-g); border-radius: 10px;
+      font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold);
+      letter-spacing: 2px; cursor: pointer; transition: var(--transition);
+    }
+    .market-publish-btn:hover { background: rgba(201,168,76,0.18); }
+    .market-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 8000;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .market-modal-overlay.open { display: flex; }
+    .market-modal {
+      background: #0d1520; border: 1px solid var(--border-g); border-radius: 14px;
+      padding: 26px 22px; width: min(90vw, 380px); position: relative;
+    }
+    .market-modal::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--cyan), var(--gold)); border-radius: 14px 14px 0 0;
+    }
+    .market-modal-title {
+      font-family: var(--font-title); font-size: 1rem; color: var(--gold);
+      letter-spacing: 2px; margin-bottom: 18px;
+    }
+    .market-modal label {
+      display: block; font-family: var(--font-mono); font-size: 0.65rem;
+      color: var(--cyan); opacity: 0.7; letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase;
+    }
+    .market-modal input, .market-modal select {
+      width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+      border-radius: var(--radius); color: #e8f4ff; font-family: var(--font-body);
+      font-size: 0.9rem; padding: 10px 12px; margin-bottom: 14px; outline: none;
+      transition: var(--transition);
+    }
+    .market-modal input:focus, .market-modal select:focus { border-color: var(--gold); }
+    .market-modal select option { background: #0d1520; }
+    .market-modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .btn-modal-cancel {
+      flex: 1; padding: 10px; background: transparent; border: 1px solid var(--border);
+      border-radius: var(--radius); color: #5a7a90; font-family: var(--font-body);
+      font-size: 0.85rem; cursor: pointer; transition: var(--transition);
+    }
+    .btn-modal-cancel:hover { border-color: var(--red); color: var(--red); }
+    .btn-modal-submit {
+      flex: 2; padding: 10px; background: linear-gradient(135deg, var(--gold), #a07830);
+      border: none; border-radius: var(--radius); color: #050a0f; font-family: var(--font-body);
+      font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: var(--transition);
+    }
+    .btn-modal-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-modal-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .market-status {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      padding: 8px 14px; border-radius: var(--radius); margin-bottom: 16px; display: none;
+    }
+    .market-status.ok  { background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.3); color: var(--green); display: block; }
+    .market-status.err { background: rgba(255,61,61,0.08);  border: 1px solid rgba(255,61,61,0.3);  color: var(--red);   display: block; }
+    .market-loading {
+      text-align: center; padding: 30px; font-family: var(--font-mono);
+      font-size: 0.72rem; color: #3a5a70; letter-spacing: 2px; animation: pulse 1.5s ease infinite;
+    }
+    .market-empty {
+      text-align: center; padding: 40px 20px; font-family: var(--font-mono);
+      font-size: 0.78rem; color: #3a5a70; letter-spacing: 1px;
+    }
+    /* SELLERS loading */
+    .sellers-loading {
+      text-align: center; padding: 30px; font-family: var(--font-mono);
+      font-size: 0.72rem; color: #3a5a70; letter-spacing: 2px; animation: pulse 1.5s ease infinite;
+    }
+    .sellers-empty {
+      text-align: center; padding: 40px 20px; font-family: var(--font-mono);
+      font-size: 0.78rem; color: #3a5a70; letter-spacing: 1px;
+    }
+
     /* ============================================ BUILDS */
     .builds-view { padding: 28px 0 60px; }
     .class-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -596,54 +673,59 @@
           <div class="view-header-sub">Items listados por la comunidad · Actualizado en tiempo real</div>
         </div>
       </div>
+
+      <!-- Publish button -->
+      <button class="market-publish-btn" id="marketPublishBtn">+ PUBLICAR ITEM EN EL MARKET</button>
+
+      <!-- Status message -->
+      <div class="market-status" id="marketStatus"></div>
+
       <div class="market-filters">
-        <button class="filter-btn active">Todo</button>
-        <button class="filter-btn">Armas</button>
-        <button class="filter-btn">Armadura</button>
-        <button class="filter-btn">Accesorios</button>
-        <button class="filter-btn">Consumibles</button>
-        <button class="filter-btn">Raros</button>
+        <button class="filter-btn active" data-cat="Todo">Todo</button>
+        <button class="filter-btn" data-cat="Armas">Armas</button>
+        <button class="filter-btn" data-cat="Armadura">Armadura</button>
+        <button class="filter-btn" data-cat="Accesorios">Accesorios</button>
+        <button class="filter-btn" data-cat="Consumibles">Consumibles</button>
+        <button class="filter-btn" data-cat="Raros">Raros</button>
       </div>
-      <div class="market-grid">
-        <div class="market-item">
-          <div class="item-rarity rarity-legendary">★ Legendario</div>
-          <div class="item-name">Blade of the Void King</div>
-          <div class="item-seller">por DarkLord_99 · hace 2h</div>
-          <div class="item-price">85,000 <span class="item-price-unit">gold</span></div>
-        </div>
-        <div class="market-item">
-          <div class="item-rarity rarity-epic">◆ Épico</div>
-          <div class="item-name">Shadowstep Cloak +7</div>
-          <div class="item-seller">por NightWarden · hace 4h</div>
-          <div class="item-price">42,500 <span class="item-price-unit">gold</span></div>
-        </div>
-        <div class="market-item">
-          <div class="item-rarity rarity-rare">● Raro</div>
-          <div class="item-name">Rune of Eternal Frost</div>
-          <div class="item-seller">por IronSmith_X · hace 1h</div>
-          <div class="item-price">18,000 <span class="item-price-unit">gold</span></div>
-        </div>
-        <div class="market-item">
-          <div class="item-rarity rarity-legendary">★ Legendario</div>
-          <div class="item-name">Dragon Scale Shield</div>
-          <div class="item-seller">por RuneMaster · hace 6h</div>
-          <div class="item-price">120,000 <span class="item-price-unit">gold</span></div>
-        </div>
-        <div class="market-item">
-          <div class="item-rarity rarity-rare">● Raro</div>
-          <div class="item-name">Enchanted Archer Bracers</div>
-          <div class="item-seller">por StormArrow · hace 30min</div>
-          <div class="item-price">9,800 <span class="item-price-unit">gold</span></div>
-        </div>
-        <div class="market-item">
-          <div class="item-rarity rarity-epic">◆ Épico</div>
-          <div class="item-name">Staff of Ancient Echoes</div>
-          <div class="item-seller">por FrostWitch · hace 3h</div>
-          <div class="item-price">55,000 <span class="item-price-unit">gold</span></div>
-        </div>
+
+      <div class="market-grid" id="marketGrid">
+        <div class="market-loading" style="grid-column:1/-1">CARGANDO MARKET...</div>
       </div>
+
       <div class="market-cta">
         ¿Querés vender? <a href="#" data-nav="reliable">Convertite en Vendedor Verificado →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKET PUBLISH MODAL -->
+  <div class="market-modal-overlay" id="marketModalOverlay">
+    <div class="market-modal">
+      <div class="market-modal-title">📦 PUBLICAR ITEM</div>
+      <label>Tu nickname</label>
+      <input type="text" id="mNick" placeholder="Tu nick en el juego..." maxlength="30" />
+      <label>Nombre del item</label>
+      <input type="text" id="mName" placeholder="Ej: Blade of the Void King" maxlength="60" />
+      <label>Categoría</label>
+      <select id="mCat">
+        <option value="Armas">Armas</option>
+        <option value="Armadura">Armadura</option>
+        <option value="Accesorios">Accesorios</option>
+        <option value="Consumibles">Consumibles</option>
+        <option value="Raros">Raros</option>
+      </select>
+      <label>Rareza</label>
+      <select id="mRarity">
+        <option value="rare">● Raro</option>
+        <option value="epic">◆ Épico</option>
+        <option value="legendary">★ Legendario</option>
+      </select>
+      <label>Precio (gold)</label>
+      <input type="number" id="mPrice" placeholder="Ej: 50000" min="1" />
+      <div class="market-modal-actions">
+        <button class="btn-modal-cancel" id="marketModalCancel">Cancelar</button>
+        <button class="btn-modal-submit" id="marketModalSubmit">Publicar</button>
       </div>
     </div>
   </div>
@@ -810,23 +892,8 @@
         </div>
       </div>
       <div class="verified-badge-big">✅ Todos verificados por moderadores de la comunidad</div>
-      <div class="sellers-full">
-        <div class="seller-card">
-          <div class="seller-card-top"><div class="seller-avatar">⚔</div><div><div class="seller-card-name">DarkLord_99</div><div class="seller-card-rank gold">★ GOLD — Rango Máximo</div></div></div>
-          <div class="seller-card-stats"><div class="seller-stat"><span class="seller-stat-val">2,341</span><span class="seller-stat-label">TRADES</span></div><div class="seller-stat"><span class="seller-stat-val">100%</span><span class="seller-stat-label">POSITIVOS</span></div><div class="seller-stat"><span class="seller-stat-val">2y</span><span class="seller-stat-label">ANTIGÜEDAD</span></div></div>
-        </div>
-        <div class="seller-card">
-          <div class="seller-card-top"><div class="seller-avatar">🔨</div><div><div class="seller-card-name">IronSmith_X</div><div class="seller-card-rank gold">★ GOLD</div></div></div>
-          <div class="seller-card-stats"><div class="seller-stat"><span class="seller-stat-val">1,872</span><span class="seller-stat-label">TRADES</span></div><div class="seller-stat"><span class="seller-stat-val">99.8%</span><span class="seller-stat-label">POSITIVOS</span></div><div class="seller-stat"><span class="seller-stat-val">18m</span><span class="seller-stat-label">ANTIGÜEDAD</span></div></div>
-        </div>
-        <div class="seller-card">
-          <div class="seller-card-top"><div class="seller-avatar">🔮</div><div><div class="seller-card-name">RuneMaster</div><div class="seller-card-rank silver">✦ SILVER</div></div></div>
-          <div class="seller-card-stats"><div class="seller-stat"><span class="seller-stat-val">943</span><span class="seller-stat-label">TRADES</span></div><div class="seller-stat"><span class="seller-stat-val">99.5%</span><span class="seller-stat-label">POSITIVOS</span></div><div class="seller-stat"><span class="seller-stat-val">11m</span><span class="seller-stat-label">ANTIGÜEDAD</span></div></div>
-        </div>
-        <div class="seller-card">
-          <div class="seller-card-top"><div class="seller-avatar">🌙</div><div><div class="seller-card-name">NightWarden</div><div class="seller-card-rank silver">✦ SILVER</div></div></div>
-          <div class="seller-card-stats"><div class="seller-stat"><span class="seller-stat-val">711</span><span class="seller-stat-label">TRADES</span></div><div class="seller-stat"><span class="seller-stat-val">99.1%</span><span class="seller-stat-label">POSITIVOS</span></div><div class="seller-stat"><span class="seller-stat-val">8m</span><span class="seller-stat-label">ANTIGÜEDAD</span></div></div>
-        </div>
+      <div class="sellers-full" id="sellersGrid">
+        <div class="sellers-loading">CARGANDO VENDEDORES...</div>
       </div>
     </div>
   </div>
@@ -863,7 +930,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- FORO -->
   <div class="view" id="view-foro">
     <div class="main-content foro-view">
@@ -1074,6 +1141,43 @@
       .subscribe();
 
     loadpost();
-  </script>
-</body>
-</html>
+
+    /* ============================================
+       MARKET — SUPABASE
+       ============================================
+       Tabla esperada en Supabase (crea con SQL editor):
+       CREATE TABLE market (
+         id bigserial primary key,
+         created_at timestamptz default now(),
+         nickname text not null,
+         item_name text not null,
+         category text not null,
+         rarity text not null,   -- 'rare' | 'epic' | 'legendary'
+         price integer not null
+       );
+       ALTER TABLE market ENABLE ROW LEVEL SECURITY;
+       CREATE POLICY "anon read"  ON market FOR SELECT USING (true);
+       CREATE POLICY "anon insert" ON market FOR INSERT WITH CHECK (true);
+    ============================================ */
+
+    const marketGrid   = document.getElementById('marketGrid');
+    const marketStatus = document.getElementById('marketStatus');
+    const marketModalOverlay = document.getElementById('marketModalOverlay');
+
+    let currentCategory = 'Todo';
+    let allMarketItems  = [];
+
+    const RARITY_LABELS = { rare: '● Raro', epic: '◆ Épico', legendary: '★ Legendario' };
+    const RARITY_CLASS  = { rare: 'rarity-rare', epic: 'rarity-epic', legendary: 'rarity-legendary' };
+
+    function timeAgoMarket(ts) {
+      const diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+      if (diff < 60)    return 'ahora mismo';
+      if (diff < 3600)  return `hace ${Math.floor(diff/60)} min`;
+      if (diff < 86400) return `hace ${Math.floor(diff/3600)}h`;
+      return `hace ${Math.floor(diff/86400)}d`;
+    }
+
+    function renderMarketItem(item, prepend = false) {
+      const div = document.createElement('div');
+      div.className = 'market-item
