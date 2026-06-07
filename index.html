@@ -1022,9 +1022,9 @@
       setTimeout(() => { foroStatus.className = 'foro-status'; }, 3000);
     }
 
-    async function loadPosts() {
+    async function loadpost() {
       const { data, error } = await db
-        .from('posts')
+        .from('post')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
@@ -1046,7 +1046,7 @@
       publishBtn.disabled = true;
       publishBtn.textContent = 'Publicando...';
 
-      const { error } = await db.from('posts').insert({ nickname: nick, content });
+      const { error } = await db.from('post').insert({ nickname: nick, content });
 
       publishBtn.disabled = false;
       publishBtn.textContent = 'Publicar';
@@ -1065,15 +1065,15 @@
     });
 
     // Realtime
-    db.channel('posts-channel')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
+    db.channel('post-channel')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'post' }, payload => {
         const empty = foroFeed.querySelector('.foro-empty');
         if (empty) empty.remove();
         renderPost(payload.new, true);
       })
       .subscribe();
 
-    loadPosts();
+    loadpost();
   </script>
 </body>
 </html>
