@@ -8,508 +8,994 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+/* ===================== GITHUB CONFIG BANNER ===================== */
+.config-banner {
+  position: fixed; bottom: 16px; right: 16px; z-index: 9999;
+  background: #161b22; border: 1px solid rgba(212,175,55,.5);
+  border-radius: 10px; padding: 14px 18px; max-width: 300px;
+  box-shadow: 0 4px 30px rgba(0,0,0,.6);
+  font-family: 'Rajdhani', sans-serif;
+}
+.config-banner h4 { color: #d4af37; margin: 0 0 10px; font-size: .95rem; }
+.config-banner input {
+  width: 100%; background: rgba(255,255,255,.05);
+  border: 1px solid rgba(212,175,55,.25); border-radius: 6px;
+  padding: 7px 10px; color: #e8e8e8; font-size: .82rem;
+  font-family: 'Share Tech Mono', monospace; margin-bottom: 6px; box-sizing: border-box;
+}
+.config-banner input:focus { outline: none; border-color: #d4af37; }
+.config-banner button {
+  width: 100%; background: rgba(212,175,55,.2);
+  border: 1px solid rgba(212,175,55,.5); border-radius: 6px;
+  color: #d4af37; padding: 8px; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: .9rem;
+  transition: background .2s;
+}
+.config-banner button:hover { background: rgba(212,175,55,.35); }
+.config-banner .cfg-note { font-size: .72rem; color: #666; margin-top: 6px; line-height: 1.4; }
+.config-banner.hidden { display: none; }
+
+/* ===================== MODAL OVERLAY ===================== */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.78); backdrop-filter: blur(5px);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #0d1117; border: 1px solid rgba(212,175,55,.3);
+  border-radius: 14px; width: min(560px, 94vw); max-height: 85vh;
+  overflow-y: auto; padding: 28px 24px 24px; position: relative;
+  box-shadow: 0 0 80px rgba(212,175,55,.1);
+}
+.modal-box::-webkit-scrollbar { width: 4px; }
+.modal-box::-webkit-scrollbar-thumb { background: rgba(212,175,55,.3); border-radius: 4px; }
+.modal-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; color: #aaa;
+  font-size: 1.3rem; cursor: pointer; transition: color .2s; line-height:1;
+}
+.modal-close:hover { color: #d4af37; }
+.modal-title {
+  font-family: 'Cinzel Decorative', serif; font-size: .95rem;
+  color: #d4af37; margin: 0 0 18px; letter-spacing: .07em;
+}
+.modal-loading {
+  text-align: center; padding: 40px 20px;
+  color: #888; font-family: 'Share Tech Mono', monospace; font-size: .85rem;
+}
+.modal-loading .spin {
+  display: inline-block; font-size: 1.5rem;
+  animation: spin 1s linear infinite; margin-bottom: 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.modal-error {
+  text-align: center; padding: 30px; color: #f87171;
+  font-family: 'Rajdhani', sans-serif; font-size: .95rem;
+}
+.modal-error span { display: block; font-size: 1.6rem; margin-bottom: 8px; }
+
+/* ===================== SEARCH BAR ===================== */
+.modal-search {
+  display: flex; gap: 8px; margin-bottom: 16px;
+}
+.modal-search input {
+  flex: 1; background: rgba(255,255,255,.05);
+  border: 1px solid rgba(212,175,55,.2); border-radius: 6px;
+  padding: 8px 12px; color: #e8e8e8;
+  font-family: 'Rajdhani', sans-serif; font-size: .93rem; outline: none;
+}
+.modal-search input:focus { border-color: #d4af37; }
+.modal-search button {
+  background: rgba(212,175,55,.15); border: 1px solid rgba(212,175,55,.4);
+  border-radius: 6px; color: #d4af37; padding: 8px 14px; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; transition: background .2s;
+}
+.modal-search button:hover { background: rgba(212,175,55,.28); }
+
+/* ===================== MARKET ===================== */
+.item-list { display: flex; flex-direction: column; gap: 9px; }
+.item-row {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px; padding: 10px 14px; cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.item-row:hover { border-color: rgba(212,175,55,.35); background: rgba(212,175,55,.04); }
+.item-icon { font-size: 1.4rem; min-width: 28px; }
+.item-info { flex: 1; }
+.item-name { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: .95rem; color: #e8e8e8; }
+.item-seller { font-size: .76rem; color: #888; font-family: 'Share Tech Mono', monospace; }
+.item-seller span { color: #d4af37; cursor: pointer; }
+.item-seller span:hover { text-decoration: underline; }
+.item-price { font-family: 'Share Tech Mono', monospace; font-size: .9rem; color: #d4af37; font-weight: 700; white-space: nowrap; }
+.item-badge { font-size: .68rem; padding: 2px 7px; border-radius: 20px; font-weight: 700; font-family: 'Rajdhani', sans-serif; }
+.badge--Legendario { background: rgba(234,179,8,.2); color: #fde047; border: 1px solid rgba(234,179,8,.4); }
+.badge--Épico      { background: rgba(168,85,247,.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,.4); }
+.badge--Raro       { background: rgba(99,102,241,.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,.4); }
+.badge--Común      { background: rgba(255,255,255,.08); color: #ccc; border: 1px solid rgba(255,255,255,.15); }
+
+/* ===================== VENDORS ===================== */
+.vendor-list { display: flex; flex-direction: column; gap: 9px; }
+.vendor-card {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px; padding: 12px 14px; cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.vendor-card:hover { border-color: rgba(212,175,55,.35); background: rgba(212,175,55,.04); }
+.vendor-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg,#1a1a2e,#16213e);
+  border: 2px solid rgba(212,175,55,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.vendor-info { flex: 1; }
+.vendor-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; color: #e8e8e8; }
+.vendor-meta { font-size: .75rem; color: #777; font-family: 'Share Tech Mono', monospace; }
+.vendor-meta span { color: #a0a0a0; }
+.vendor-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.vendor-status { font-size: .7rem; font-weight: 700; font-family: 'Rajdhani', sans-serif; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+.status--online  { background: rgba(34,197,94,.15); color: #4ade80; border: 1px solid rgba(34,197,94,.3); }
+.status--away    { background: rgba(234,179,8,.12); color: #fbbf24; border: 1px solid rgba(234,179,8,.3); }
+.status--offline { background: rgba(255,255,255,.06); color: #888; border: 1px solid rgba(255,255,255,.12); }
+.vendor-stars { font-size: .78rem; color: #d4af37; }
+
+/* ===================== BUILD ===================== */
+.build-list { display: flex; flex-direction: column; gap: 9px; }
+.build-card {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px; padding: 14px; cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.build-card:hover { border-color: rgba(212,175,55,.35); background: rgba(212,175,55,.04); }
+.build-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.build-class-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+.build-title-wrap { flex: 1; }
+.build-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; color: #e8e8e8; }
+.build-author { font-size: .75rem; color: #888; font-family: 'Share Tech Mono', monospace; }
+.build-author span { color: #d4af37; cursor: pointer; }
+.build-author span:hover { text-decoration: underline; }
+.build-stats-bar { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
+.bstat { font-size: .75rem; color: #888; font-family: 'Share Tech Mono', monospace; }
+.bstat span { color: #c0c0c0; }
+.build-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.build-tag {
+  font-size: .7rem; padding: 2px 8px; border-radius: 20px;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600;
+  background: rgba(212,175,55,.1); color: #d4af37; border: 1px solid rgba(212,175,55,.25);
+}
+
+/* ===================== USER PROFILE MODAL ===================== */
+.profile-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+  padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.profile-avatar {
+  width: 58px; height: 58px; border-radius: 50%;
+  background: linear-gradient(135deg,#1a1a2e,#16213e);
+  border: 2px solid rgba(212,175,55,.4);
+  display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+}
+.profile-name { font-family: 'Cinzel Decorative', serif; font-size: 1rem; color: #e8e8e8; }
+.profile-class { font-size: .8rem; color: #888; font-family: 'Share Tech Mono', monospace; margin: 3px 0; }
+.profile-stats-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 4px; }
+.pstat { font-size: .78rem; font-family: 'Share Tech Mono', monospace; }
+.pstat .pl { color: #666; }
+.pstat .pv { color: #d4af37; }
+.profile-section-title {
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  color: #d4af37; font-size: .85rem; letter-spacing: .06em;
+  text-transform: uppercase; margin: 18px 0 10px;
+}
+.profile-items { display: flex; flex-direction: column; gap: 7px; }
+.profile-builds { display: flex; flex-direction: column; gap: 7px; }
+
+/* ===================== OPINIONS ===================== */
+.opinion-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.opinion-item {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px; padding: 10px 14px;
+}
+.opinion-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.opinion-from { font-family: 'Rajdhani', sans-serif; font-weight: 700; color: #d4af37; font-size: .88rem; }
+.opinion-stars { color: #fbbf24; font-size: .82rem; }
+.opinion-date { font-size: .7rem; color: #666; font-family: 'Share Tech Mono', monospace; margin-left: auto; }
+.opinion-text { font-size: .83rem; color: #bbb; font-family: 'Rajdhani', sans-serif; line-height: 1.5; }
+.no-opinions { font-size: .85rem; color: #666; font-family: 'Share Tech Mono', monospace; text-align: center; padding: 10px; }
+
+/* ===================== ADD OPINION FORM ===================== */
+.opinion-form {
+  background: rgba(212,175,55,.06); border: 1px solid rgba(212,175,55,.2);
+  border-radius: 8px; padding: 14px;
+}
+.opinion-form-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; color: #d4af37; font-size: .85rem; margin-bottom: 10px; }
+.star-picker { display: flex; gap: 6px; margin-bottom: 10px; }
+.star-btn {
+  background: none; border: none; font-size: 1.3rem; cursor: pointer;
+  color: #444; transition: color .15s, transform .1s;
+}
+.star-btn.active, .star-btn:hover { color: #fbbf24; transform: scale(1.15); }
+.opinion-form input,
+.opinion-form textarea {
+  width: 100%; background: rgba(255,255,255,.05);
+  border: 1px solid rgba(212,175,55,.2); border-radius: 6px;
+  padding: 8px 10px; color: #e8e8e8;
+  font-family: 'Rajdhani', sans-serif; font-size: .88rem;
+  margin-bottom: 8px; box-sizing: border-box; outline: none; resize: none;
+}
+.opinion-form input:focus,
+.opinion-form textarea:focus { border-color: #d4af37; }
+.opinion-form textarea { height: 72px; }
+.opinion-submit {
+  background: rgba(212,175,55,.2); border: 1px solid rgba(212,175,55,.5);
+  border-radius: 6px; color: #d4af37; padding: 8px 18px; cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: .9rem;
+  transition: background .2s;
+}
+.opinion-submit:hover { background: rgba(212,175,55,.35); }
+.opinion-submit:disabled { opacity: .4; cursor: not-allowed; }
+.opinion-success {
+  text-align: center; color: #4ade80; font-family: 'Rajdhani', sans-serif;
+  font-size: .88rem; padding: 8px; animation: fadeIn .4s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ===================== TABS ===================== */
+.modal-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.08); padding-bottom: 0; }
+.tab-btn {
+  background: none; border: none; color: #888; font-family: 'Rajdhani', sans-serif;
+  font-weight: 600; font-size: .88rem; padding: 8px 14px; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+  position: relative; bottom: -1px;
+}
+.tab-btn:hover { color: #d4af37; }
+.tab-btn.active { color: #d4af37; border-bottom-color: #d4af37; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ===================== FILTER PILLS ===================== */
+.filter-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.pill {
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 20px; padding: 4px 12px; font-size: .75rem;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; cursor: pointer;
+  color: #888; transition: all .2s;
+}
+.pill:hover, .pill.active { background: rgba(212,175,55,.18); color: #d4af37; border-color: rgba(212,175,55,.4); }
+</style>
 </head>
 <body>
 
-  <!-- PARTICLES BACKGROUND -->
-  <div class="particles" id="particles"></div>
+<div class="particles" id="particles"></div>
+<div class="grid-overlay"></div>
 
-  <!-- OVERLAY GRID -->
-  <div class="grid-overlay"></div>
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <span class="logo-icon">⚔</span>
+    <span class="logo-text">AURCUS</span>
+    <span class="logo-sub">ONLINE</span>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar">
-    <div class="nav-logo">
-      <span class="logo-icon">⚔</span>
-      <span class="logo-text">AURCUS</span>
-      <span class="logo-sub">ONLINE</span>
-    </div>
-    <div class="nav-right">
-      <button class="btn-become-seller" id="openAuthModal">👤 Login / Register</button>
-      <button class="hamburger" id="hamburger" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
+<!-- ===== DRAWER ===== -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-header">
+    <span class="drawer-title">⚔ AURCUS MENU</span>
+    <button class="drawer-close" id="drawerClose">✕</button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="#help" class="drawer-item"><span class="d-icon">❓</span><div class="d-info"><span class="d-title">Help Gate</span><span class="d-desc">Soporte y guías</span></div><span class="d-arrow">›</span></a>
+    <a href="#" class="drawer-item" id="drawerMarket"><span class="d-icon">💰</span><div class="d-info"><span class="d-title">Market</span><span class="d-desc">Vender / comprar ítems</span></div><span class="d-arrow">›</span></a>
+    <a href="#" class="drawer-item" id="drawerVendors"><span class="d-icon">🏪</span><div class="d-info"><span class="d-title">Vendedores</span><span class="d-desc">Usuarios que venden</span></div><span class="d-arrow">›</span></a>
+    <a href="#" class="drawer-item" id="drawerBuild"><span class="d-icon">🛡</span><div class="d-info"><span class="d-title">Builds</span><span class="d-desc">Builds de personajes</span></div><span class="d-arrow">›</span></a>
+    <a href="#reliable" class="drawer-item"><span class="d-icon">✅</span><div class="d-info"><span class="d-title">Vendedores Confiables</span><span class="d-desc">Traders verificados</span></div><span class="d-arrow">›</span></a>
+    <a href="#rankings" class="drawer-item"><span class="d-icon">🏆</span><div class="d-info"><span class="d-title">Rankings</span><span class="d-desc">Top jugadores</span></div><span class="d-arrow">›</span></a>
+    <a href="#events" class="drawer-item"><span class="d-icon">⚡</span><div class="d-info"><span class="d-title">Eventos</span><span class="d-desc">Eventos activos</span></div><span class="d-arrow">›</span></a>
   </nav>
+  <div class="drawer-footer">
+    <span class="online-badge" id="onlineBadge">● Cargando...</span>
+  </div>
+</aside>
 
-  <!-- ===== SIDE DRAWER MENU ===== -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <aside class="drawer" id="drawer">
-    <div class="drawer-header">
-      <span class="drawer-title">⚔ AURCUS MENU</span>
-      <button class="drawer-close" id="drawerClose">✕</button>
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Bienvenido al</p>
+    <h1 class="hero-title">
+      <span class="title-line">AURCUS</span>
+      <span class="title-line accent">ONLINE</span>
+    </h1>
+    <p class="hero-subtitle">Community Hub — Tradea · Buildea · Conquista</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num" id="statMembers">0</span>
+        <span class="stat-label">Miembros</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num" id="statOnline">0</span>
+        <span class="stat-label">Online Ahora</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num" id="statItems">0</span>
+        <span class="stat-label">Ítems en Venta</span>
+      </div>
     </div>
-    <nav class="drawer-nav">
-      <a href="#help" class="drawer-item" data-section="help">
-        <span class="d-icon">❓</span>
-        <div class="d-info"><span class="d-title">Help Gate</span><span class="d-desc">Support & guides</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-      <a href="#platinum-market" class="drawer-item" data-section="platinum-market">
-        <span class="d-icon">💎</span>
-        <div class="d-info"><span class="d-title">Platinum Market</span><span class="d-desc">Buy & sell platinum P2P</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-      <a href="#market" class="drawer-item" data-section="market">
-        <span class="d-icon">💰</span>
-        <div class="d-info"><span class="d-title">Market</span><span class="d-desc">Browse listings</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-      <a href="#infobuild" class="drawer-item" data-section="infobuild">
-        <span class="d-icon">🛡</span>
-        <div class="d-info"><span class="d-title">Info Build</span><span class="d-desc">Character builds</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-      <a href="#reliable" class="drawer-item" data-section="reliable">
-        <span class="d-icon">✅</span>
-        <div class="d-info"><span class="d-title">Reliable Seller</span><span class="d-desc">Verified traders</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-      <a href="#rankings" class="drawer-item" data-section="rankings">
-        <span class="d-icon">🏆</span>
-        <div class="d-info"><span class="d-title">Rankings</span><span class="d-desc">Top players</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-      <a href="#events" class="drawer-item" data-section="events">
-        <span class="d-icon">⚡</span>
-        <div class="d-info"><span class="d-title">Events</span><span class="d-desc">Active events</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-      <a href="#community" class="drawer-item" data-section="community">
-        <span class="d-icon">👥</span>
-        <div class="d-info"><span class="d-title">Community</span><span class="d-desc">Forums & chat</span></div>
-        <span class="d-arrow">›</span>
-      </a>
-    </nav>
-    <div class="drawer-footer">
-      <span class="online-badge">● 1,247 Online</span>
+    <div class="hero-cta">
+      <a href="#" class="btn-primary" id="heroMarketBtn">Ir al Market</a>
+      <a href="#help" class="btn-ghost">Ayuda</a>
     </div>
-  </aside>
+  </div>
+  <div class="hero-deco">
+    <div class="deco-ring ring1"></div>
+    <div class="deco-ring ring2"></div>
+    <div class="deco-ring ring3"></div>
+  </div>
+</header>
 
-  <!-- ===== MODAL AUTH (Login / Register) ===== -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal-box">
-      <button class="modal-close" id="closeAuthModal">✕</button>
+<!-- ===== MAIN ===== -->
+<main class="main-content">
+
+  <div class="alert-banner">
+    <span class="alert-icon">⚡</span>
+    <span class="alert-text">EVENTO ACTIVO: Double Drop Weekend — Termina en <span id="countdown">23:59:59</span></span>
+  </div>
+
+  <!-- QUICK CARDS -->
+  <section class="cards-section">
+    <div class="section-label">Acceso Rápido</div>
+    <div class="cards-grid">
+      <a href="#" class="card" id="cardMarket">
+        <div class="card-bg card-bg--market"></div>
+        <div class="card-icon">💰</div>
+        <h3 class="card-title">Market</h3>
+        <p class="card-desc">Publicá y comprá ítems, equipo y drops raros de la comunidad.</p>
+        <span class="card-link">Vender ítem →</span>
+      </a>
+      <a href="#" class="card" id="cardVendors">
+        <div class="card-bg card-bg--seller"></div>
+        <div class="card-icon">🏪</div>
+        <h3 class="card-title">Vendedores</h3>
+        <p class="card-desc">Explorá los usuarios que tienen ítems en venta ahora mismo.</p>
+        <span class="card-link">Ver vendedores →</span>
+      </a>
+      <a href="#" class="card" id="cardBuild">
+        <div class="card-bg card-bg--build"></div>
+        <div class="card-icon">🛡</div>
+        <h3 class="card-title">Builds</h3>
+        <p class="card-desc">Descubrí las mejores builds compartidas por los top players.</p>
+        <span class="card-link">Ver Builds →</span>
+      </a>
+      <a href="#reliable" class="card">
+        <div class="card-bg card-bg--reliable"></div>
+        <div class="card-icon">✅</div>
+        <h3 class="card-title">Vendedores Confiables</h3>
+        <p class="card-desc">Traders verificados por la comunidad — trades seguros garantizados.</p>
+        <span class="card-link">Ver Verificados →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- HELP -->
+  <section class="section-block" id="help">
+    <div class="section-header">
+      <span class="sh-icon">❓</span>
+      <div><h2 class="sh-title">Help Gate</h2><p class="sh-sub">Guías, FAQs y soporte para la comunidad</p></div>
+    </div>
+    <div class="help-grid">
+      <div class="help-card"><span class="hc-num">01</span><h4>Primeros Pasos</h4><p>¿Nuevo en Aurcus Online? Leé nuestra guía para comenzar desde cero.</p></div>
+      <div class="help-card"><span class="hc-num">02</span><h4>Reglas del Market</h4><p>Conocé las normas de intercambio antes de tu primera operación.</p></div>
+      <div class="help-card"><span class="hc-num">03</span><h4>Reportar Scam</h4><p>¿Encontraste un vendedor fraudulento? Reportalo aquí de inmediato.</p></div>
+      <div class="help-card"><span class="hc-num">04</span><h4>Contactar Mods</h4><p>Comunicate con el equipo de moderación ante cualquier problema.</p></div>
+    </div>
+  </section>
+
+  <!-- RELIABLE -->
+  <section class="section-block" id="reliable">
+    <div class="section-header">
+      <span class="sh-icon">✅</span>
+      <div><h2 class="sh-title">Vendedores Confiables</h2><p class="sh-sub">Verificados por la comunidad — tus trades seguros</p></div>
+    </div>
+    <div class="sellers-list" id="reliableList">
+      <div class="modal-loading"><div class="spin">⚙</div><br>Cargando vendedores...</div>
+    </div>
+  </section>
+
+  <!-- RANKINGS -->
+  <section class="section-block" id="rankings">
+    <div class="section-header">
+      <span class="sh-icon">🏆</span>
+      <div><h2 class="sh-title">Rankings</h2><p class="sh-sub">Top jugadores de esta temporada</p></div>
+    </div>
+    <div class="rank-table" id="rankTable">
+      <div class="rank-row rank-row--header"><span>#</span><span>Jugador</span><span>Clase</span><span>Trades</span></div>
+      <div class="modal-loading"><div class="spin">⚙</div><br>Cargando...</div>
+    </div>
+  </section>
+
+  <!-- EVENTS -->
+  <section class="section-block" id="events">
+    <div class="section-header">
+      <span class="sh-icon">⚡</span>
+      <div><h2 class="sh-title">Eventos Activos</h2><p class="sh-sub">No te pierdas las oportunidades por tiempo limitado</p></div>
+    </div>
+    <div class="events-grid">
+      <div class="event-card event--active"><span class="event-tag">EN VIVO</span><h4>Double Drop Weekend</h4><p>Todas las mazmorras dropean el doble hasta el domingo a medianoche.</p></div>
+      <div class="event-card event--soon"><span class="event-tag soon">PRÓXIMO</span><h4>Guild Wars Temporada 3</h4><p>Gran torneo Guild vs Guild. Las inscripciones abren el lunes.</p></div>
+      <div class="event-card event--soon"><span class="event-tag soon">PRÓXIMO</span><h4>Subasta de Legendarios</h4><p>Pujas por ítems legendarios — solo el 15 de junio.</p></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-logo">⚔ AURCUS ONLINE</div>
+  <p class="footer-text">Hub comunitario independiente. No afiliado con los desarrolladores oficiales.</p>
+  <div class="footer-links">
+    <a href="#help">Ayuda</a>
+    <a href="#" id="footerMarket">Market</a>
+    <a href="#rankings">Rankings</a>
+  </div>
+  <p class="footer-copy">© 2026 Aurcus Community Hub</p>
+</footer>
+
+<!-- ===== MODAL: MARKET ===== -->
+<div class="modal-overlay" id="modalMarket">
+  <div class="modal-box">
+    <button class="modal-close" data-modal="modalMarket">✕</button>
+    <h2 class="modal-title">💰 MARKET — Ítems en venta</h2>
+    <div class="modal-search">
+      <input type="text" placeholder="Buscar ítem o vendedor..." id="marketSearch" />
+      <button onclick="App.filterMarket()">Buscar</button>
+    </div>
+    <div class="filter-pills" id="marketPills">
+      <span class="pill active" data-rarity="all">Todos</span>
+      <span class="pill" data-rarity="Legendario">Legendario</span>
+      <span class="pill" data-rarity="Épico">Épico</span>
+      <span class="pill" data-rarity="Raro">Raro</span>
+      <span class="pill" data-rarity="Común">Común</span>
+    </div>
+    <div class="item-list" id="itemList">
+      <div class="modal-loading"><div class="spin">⚙</div><br>Cargando ítems...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: VENDORS ===== -->
+<div class="modal-overlay" id="modalVendors">
+  <div class="modal-box">
+    <button class="modal-close" data-modal="modalVendors">✕</button>
+    <h2 class="modal-title">🏪 VENDEDORES — Usuarios activos</h2>
+    <div class="modal-search">
+      <input type="text" placeholder="Buscar usuario..." id="vendorSearch" />
+      <button onclick="App.filterVendors()">Buscar</button>
+    </div>
+    <div class="filter-pills" id="vendorPills">
+      <span class="pill active" data-status="all">Todos</span>
+      <span class="pill" data-status="online">● Online</span>
+      <span class="pill" data-status="away">◐ Ausente</span>
+      <span class="pill" data-status="offline">○ Offline</span>
+    </div>
+    <div class="vendor-list" id="vendorList">
+      <div class="modal-loading"><div class="spin">⚙</div><br>Cargando usuarios...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: BUILDS ===== -->
+<div class="modal-overlay" id="modalBuild">
+  <div class="modal-box">
+    <button class="modal-close" data-modal="modalBuild">✕</button>
+    <h2 class="modal-title">🛡 BUILDS — Compartidas por la comunidad</h2>
+    <div class="modal-search">
+      <input type="text" placeholder="Buscar build o clase..." id="buildSearch" />
+      <button onclick="App.filterBuilds()">Buscar</button>
+    </div>
+    <div class="build-list" id="buildList">
+      <div class="modal-loading"><div class="spin">⚙</div><br>Cargando builds...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: PERFIL DE USUARIO ===== -->
+<div class="modal-overlay" id="modalProfile">
+  <div class="modal-box">
+    <button class="modal-close" data-modal="modalProfile">✕</button>
+    <div id="profileContent">
+      <div class="modal-loading"><div class="spin">⚙</div><br>Cargando perfil...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONFIG BANNER (GitHub) ===== -->
+<div class="config-banner" id="configBanner">
+  <h4>⚙ Conectar GitHub</h4>
+  <input type="text" id="cfgToken"  placeholder="Token de GitHub (ghp_...)" />
+  <input type="text" id="cfgOwner"  placeholder="Usuario/Org del repo" />
+  <input type="text" id="cfgRepo"   placeholder="Nombre del repo" />
+  <input type="text" id="cfgFile"   placeholder="Ruta del JSON (ej: users.json)" />
+  <button onclick="App.saveConfig()">Guardar y Cargar</button>
+  <p class="cfg-note">⚠ Usá un token con permiso <strong>repo:read</strong> solo. Los datos se guardan en localStorage de tu navegador.</p>
+</div>
+
+<script src="script.js"></script>
+<script>
+// =============================================
+//  AURCUS — GitHub Data + Modal + Opinions
+// =============================================
+
+const App = (() => {
+  // ---------- CONFIG ----------
+  let cfg = {};
+  let users = [];
+  let selectedStars = 0;
+
+  function loadConfig() {
+    try { cfg = JSON.parse(localStorage.getItem('aurcus_cfg') || '{}'); } catch(e) { cfg = {}; }
+    if (cfg.token && cfg.owner && cfg.repo && cfg.file) {
+      document.getElementById('configBanner').classList.add('hidden');
+      fetchUsers();
+    }
+  }
+
+  function saveConfig() {
+    cfg = {
+      token: document.getElementById('cfgToken').value.trim(),
+      owner: document.getElementById('cfgOwner').value.trim(),
+      repo:  document.getElementById('cfgRepo').value.trim(),
+      file:  document.getElementById('cfgFile').value.trim()
+    };
+    if (!cfg.token || !cfg.owner || !cfg.repo || !cfg.file) {
+      alert('Completá todos los campos.'); return;
+    }
+    localStorage.setItem('aurcus_cfg', JSON.stringify(cfg));
+    document.getElementById('configBanner').classList.add('hidden');
+    fetchUsers();
+  }
+
+  // ---------- FETCH ----------
+  async function fetchUsers() {
+    try {
+      const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.file}`;
+      const res = await fetch(url, {
+        headers: { Authorization: `token ${cfg.token}`, Accept: 'application/vnd.github.v3.raw' }
+      });
+      if (!res.ok) throw new Error(`GitHub: ${res.status}`);
+      const data = await res.json();
+      users = data.users || data; // accept both {users:[]} and []
+      onUsersLoaded();
+    } catch(err) {
+      console.warn('GitHub fetch failed, usando datos de demo:', err);
+      users = DEMO_USERS;
+      onUsersLoaded();
+    }
+  }
+
+  function onUsersLoaded() {
+    updateHeroStats();
+    renderReliable();
+    renderRankings();
+  }
+
+  // ---------- STATS ----------
+  function animNum(el, target) {
+    let cur = 0; const steps = 60;
+    const inc = target / steps;
+    const t = setInterval(() => {
+      cur += inc;
+      if (cur >= target) { el.textContent = target.toLocaleString(); clearInterval(t); }
+      else el.textContent = Math.floor(cur).toLocaleString();
+    }, 22);
+  }
+
+  function updateHeroStats() {
+    const online = users.filter(u => u.status === 'online').length;
+    const items  = users.reduce((a, u) => a + (u.items?.length || 0), 0);
+    animNum(document.getElementById('statMembers'), users.length);
+    animNum(document.getElementById('statOnline'),  online);
+    animNum(document.getElementById('statItems'),   items);
+    document.getElementById('onlineBadge').textContent = `● ${online} Online`;
+  }
+
+  // ---------- RELIABLE ----------
+  function renderReliable() {
+    const el = document.getElementById('reliableList');
+    const sorted = [...users].sort((a,b) => (b.trades||0)-(a.trades||0)).slice(0,4);
+    el.innerHTML = sorted.map(u => `
+      <div class="seller-row" onclick="App.openProfile('${u.id}')" style="cursor:pointer">
+        <span class="seller-rank ${u.trades>1500?'gold':'silver'}">${u.trades>1500?'★ ORO':'✦ PLATA'}</span>
+        <span class="seller-name">${esc(u.username)}</span>
+        <span class="seller-trades">${(u.trades||0).toLocaleString()} trades</span>
+        <span class="seller-rate">${u.rating||'?'}% ✔</span>
+      </div>`).join('');
+  }
+
+  // ---------- RANKINGS ----------
+  function renderRankings() {
+    const el = document.getElementById('rankTable');
+    const sorted = [...users].sort((a,b) => (b.trades||0)-(a.trades||0));
+    const medals = ['🥇','🥈','🥉'];
+    el.innerHTML = `<div class="rank-row rank-row--header"><span>#</span><span>Jugador</span><span>Clase</span><span>Trades</span></div>` +
+      sorted.map((u,i) => `
+        <div class="rank-row ${i<3?'rank-'+(i+1):''}" onclick="App.openProfile('${u.id}')" style="cursor:pointer">
+          <span>${medals[i]||i+1}</span>
+          <span>${esc(u.username)}</span>
+          <span>${esc(u.class||'—')}</span>
+          <span>${(u.trades||0).toLocaleString()}</span>
+        </div>`).join('');
+  }
+
+  // ---------- RENDER MARKET ----------
+  let mktFilter = 'all';
+  function renderMarket() {
+    const q = document.getElementById('marketSearch').value.toLowerCase();
+    const el = document.getElementById('itemList');
+    let rows = [];
+    users.forEach(u => {
+      (u.items||[]).forEach(item => {
+        if (mktFilter !== 'all' && item.rarity !== mktFilter) return;
+        if (q && !item.name.toLowerCase().includes(q) && !u.username.toLowerCase().includes(q)) return;
+        rows.push({ item, user: u });
+      });
+    });
+    if (!rows.length) { el.innerHTML = `<div class="modal-loading">No se encontraron ítems.</div>`; return; }
+    el.innerHTML = rows.map(({item, user}) => `
+      <div class="item-row">
+        <div class="item-icon">${item.icon||'📦'}</div>
+        <div class="item-info">
+          <div class="item-name">${esc(item.name)}</div>
+          <div class="item-seller">Vendedor: <span onclick="App.openProfile('${user.id}')">${esc(user.username)}</span></div>
+        </div>
+        <span class="item-badge badge--${item.rarity}">${item.rarity}</span>
+        <div class="item-price">${item.price?.toLocaleString()||'?'} G</div>
+      </div>`).join('');
+  }
+
+  function filterMarket() { renderMarket(); }
+
+  // ---------- RENDER VENDORS ----------
+  let vendorFilter = 'all';
+  function renderVendors() {
+    const q = document.getElementById('vendorSearch').value.toLowerCase();
+    const el = document.getElementById('vendorList');
+    let list = users.filter(u => {
+      if (vendorFilter !== 'all' && u.status !== vendorFilter) return false;
+      if (q && !u.username.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    if (!list.length) { el.innerHTML = `<div class="modal-loading">No se encontraron usuarios.</div>`; return; }
+    el.innerHTML = list.map(u => {
+      const stars = '★'.repeat(Math.round(u.rating||5)) + '☆'.repeat(5-Math.round(u.rating||5));
+      const statusLabel = { online:'● Online', away:'◐ Ausente', offline:'○ Offline' }[u.status]||u.status;
+      return `
+      <div class="vendor-card" onclick="App.openProfile('${u.id}')">
+        <div class="vendor-avatar">${u.avatar||'👤'}</div>
+        <div class="vendor-info">
+          <div class="vendor-name">${esc(u.username)}</div>
+          <div class="vendor-meta">Clase: <span>${esc(u.class||'?')}</span> · Ítems: <span>${(u.items||[]).length}</span> · Trades: <span>${(u.trades||0).toLocaleString()}</span></div>
+        </div>
+        <div class="vendor-right">
+          <span class="vendor-status status--${u.status}">${statusLabel}</span>
+          <span class="vendor-stars">${stars} ${u.rating||'?'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function filterVendors() { renderVendors(); }
+
+  // ---------- RENDER BUILDS ----------
+  function renderBuilds() {
+    const q = document.getElementById('buildSearch').value.toLowerCase();
+    const el = document.getElementById('buildList');
+    let rows = [];
+    users.forEach(u => {
+      (u.builds||[]).forEach(b => {
+        if (q && !b.title.toLowerCase().includes(q) && !u.class.toLowerCase().includes(q) && !u.username.toLowerCase().includes(q)) return;
+        rows.push({ build: b, user: u });
+      });
+    });
+    if (!rows.length) { el.innerHTML = `<div class="modal-loading">No se encontraron builds.</div>`; return; }
+    const classIcons = { Asesino:'🗡️', Guerrero:'⚔️', Mago:'🪄', Maga:'🪄', Paladín:'🛡️', Arquero:'🏹' };
+    el.innerHTML = rows.map(({build, user}) => `
+      <div class="build-card" onclick="App.openProfile('${user.id}')">
+        <div class="build-header">
+          <span class="build-class-icon">${classIcons[user.class]||'⚔️'}</span>
+          <div class="build-title-wrap">
+            <div class="build-title">${esc(build.title)}</div>
+            <div class="build-author">por <span>${esc(user.username)}</span> · ${esc(user.class||'?')}</div>
+          </div>
+        </div>
+        <div class="build-stats-bar">
+          <div class="bstat">DPS: <span>${esc(build.dps||'?')}</span></div>
+          <div class="bstat">Def: <span>${esc(build.def||'?')}</span></div>
+          <div class="bstat">Dificultad: <span>${esc(build.difficulty||'?')}</span></div>
+        </div>
+        <div class="build-tags">${(build.tags||[]).map(t=>`<span class="build-tag">${esc(t)}</span>`).join('')}</div>
+      </div>`).join('');
+  }
+
+  function filterBuilds() { renderBuilds(); }
+
+  // ---------- PROFILE ----------
+  function openProfile(uid) {
+    const user = users.find(u => u.id === uid);
+    if (!user) return;
+    closeAllModals();
+    openModal('modalProfile');
+    document.getElementById('profileContent').innerHTML = buildProfileHTML(user);
+    initStarPicker(uid);
+    // init tabs
+    document.querySelectorAll('#profileContent .tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#profileContent .tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('#profileContent .tab-panel').forEach(p=>p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  }
+
+  function buildProfileHTML(user) {
+    const stars = '★'.repeat(Math.round(user.rating||5)) + '☆'.repeat(5-Math.round(user.rating||5));
+    const statusLabel = { online:'● Online', away:'◐ Ausente', offline:'○ Offline' }[user.status]||user.status;
+    const statusClass = `status--${user.status}`;
+
+    const itemsHTML = (user.items||[]).length
+      ? (user.items||[]).map(item => `
+          <div class="item-row">
+            <div class="item-icon">${item.icon||'📦'}</div>
+            <div class="item-info">
+              <div class="item-name">${esc(item.name)}</div>
+              <div class="item-seller">Rareza: ${item.rarity}</div>
+            </div>
+            <span class="item-badge badge--${item.rarity}">${item.rarity}</span>
+            <div class="item-price">${(item.price||0).toLocaleString()} G</div>
+          </div>`).join('')
+      : '<div class="no-opinions">Sin ítems publicados.</div>';
+
+    const classIcons = { Asesino:'🗡️', Guerrero:'⚔️', Mago:'🪄', Maga:'🪄', Paladín:'🛡️', Arquero:'🏹' };
+    const buildsHTML = (user.builds||[]).length
+      ? (user.builds||[]).map(b => `
+          <div class="build-card">
+            <div class="build-header">
+              <span class="build-class-icon">${classIcons[user.class]||'⚔️'}</span>
+              <div class="build-title-wrap">
+                <div class="build-title">${esc(b.title)}</div>
+              </div>
+            </div>
+            <div class="build-stats-bar">
+              <div class="bstat">DPS: <span>${esc(b.dps||'?')}</span></div>
+              <div class="bstat">Def: <span>${esc(b.def||'?')}</span></div>
+              <div class="bstat">Dificultad: <span>${esc(b.difficulty||'?')}</span></div>
+            </div>
+            <div class="build-tags">${(b.tags||[]).map(t=>`<span class="build-tag">${esc(t)}</span>`).join('')}</div>
+          </div>`).join('')
+      : '<div class="no-opinions">Sin builds publicadas.</div>';
+
+    const opinionsHTML = (user.opinions||[]).length
+      ? (user.opinions||[]).map(op => `
+          <div class="opinion-item">
+            <div class="opinion-top">
+              <span class="opinion-from">${esc(op.from)}</span>
+              <span class="opinion-stars">${'★'.repeat(op.stars||5)}</span>
+              <span class="opinion-date">${op.date||''}</span>
+            </div>
+            <div class="opinion-text">${esc(op.text)}</div>
+          </div>`).join('')
+      : '<div class="no-opinions">Sin opiniones aún. ¡Sé el primero!</div>';
+
+    return `
+      <div class="profile-header">
+        <div class="profile-avatar">${user.avatar||'👤'}</div>
+        <div>
+          <div class="profile-name">${esc(user.username)}</div>
+          <div class="profile-class">${esc(user.class||'?')} · <span class="vendor-status ${statusClass}" style="padding:2px 8px;font-size:.7rem">${statusLabel}</span></div>
+          <div class="profile-stats-row">
+            <div class="pstat"><span class="pl">Trades: </span><span class="pv">${(user.trades||0).toLocaleString()}</span></div>
+            <div class="pstat"><span class="pl">Rating: </span><span class="pv">${stars} ${user.rating||'?'}</span></div>
+            <div class="pstat"><span class="pl">Ítems: </span><span class="pv">${(user.items||[]).length}</span></div>
+          </div>
+        </div>
+      </div>
+
       <div class="modal-tabs">
-        <button class="modal-tab active" data-tab="login">Login</button>
-        <button class="modal-tab" data-tab="register">Register</button>
+        <button class="tab-btn active" data-tab="ptab-items">Ítems</button>
+        <button class="tab-btn" data-tab="ptab-builds">Builds</button>
+        <button class="tab-btn" data-tab="ptab-opinions">Opiniones (${(user.opinions||[]).length})</button>
       </div>
 
-      <!-- LOGIN -->
-      <div class="tab-panel active" id="tab-login">
-        <h3 class="modal-title">⚔ Welcome Back</h3>
-        <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="loginUsername" placeholder="Your username" />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" />
-        </div>
-        <button class="btn-modal-primary" id="loginBtn">Login</button>
-        <p class="modal-msg" id="loginMsg"></p>
+      <div class="tab-panel active" id="ptab-items">
+        <div class="item-list">${itemsHTML}</div>
       </div>
 
-      <!-- REGISTER -->
-      <div class="tab-panel" id="tab-register">
-        <h3 class="modal-title">⚔ Join Aurcus</h3>
-        <div class="avatar-picker">
-          <p class="avatar-label">Choose your avatar:</p>
-          <div class="avatar-options">
-            <span class="avatar-opt selected" data-av="⚔️">⚔️</span>
-            <span class="avatar-opt" data-av="🛡️">🛡️</span>
-            <span class="avatar-opt" data-av="🧙">🧙</span>
-            <span class="avatar-opt" data-av="🏹">🏹</span>
-            <span class="avatar-opt" data-av="💀">💀</span>
-            <span class="avatar-opt" data-av="🐉">🐉</span>
-            <span class="avatar-opt" data-av="🔱">🔱</span>
-            <span class="avatar-opt" data-av="⚡">⚡</span>
+      <div class="tab-panel" id="ptab-builds">
+        <div class="build-list">${buildsHTML}</div>
+      </div>
+
+      <div class="tab-panel" id="ptab-opinions">
+        <div class="opinion-list">${opinionsHTML}</div>
+        <div class="opinion-form">
+          <div class="opinion-form-title">✍ Dejar una opinión</div>
+          <div class="star-picker" id="starPicker">
+            ${[1,2,3,4,5].map(n=>`<button class="star-btn" data-star="${n}" title="${n} estrella${n>1?'s':''}">★</button>`).join('')}
           </div>
+          <input type="text" id="opinionFrom" placeholder="Tu nombre de usuario (IGN)" maxlength="32" />
+          <textarea id="opinionText" placeholder="Contá tu experiencia con este vendedor..." maxlength="200"></textarea>
+          <button class="opinion-submit" id="opinionSubmit" onclick="App.submitOpinion('${user.id}')">Publicar Opinión</button>
+          <div id="opinionFeedback"></div>
         </div>
-        <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="regUsername" placeholder="Choose a username" />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="regPassword" placeholder="Min 6 characters" />
-        </div>
-        <button class="btn-modal-primary" id="registerBtn">Create Account</button>
-        <p class="modal-msg" id="registerMsg"></p>
-      </div>
-    </div>
-  </div>
+      </div>`;
+  }
 
-  <!-- ===== USER PANEL (when logged in) ===== -->
-  <div class="modal-overlay" id="userPanel">
-    <div class="modal-box user-panel-box">
-      <button class="modal-close" id="closeUserPanel">✕</button>
-      <div class="user-panel-header">
-        <span class="user-panel-avatar" id="panelAvatar">⚔️</span>
-        <div>
-          <p class="user-panel-name" id="panelName">Username</p>
-          <p class="user-panel-role" id="panelRole">Member</p>
-        </div>
-      </div>
-      <div class="user-stats-row">
-        <div class="ustat"><span class="ustat-num" id="panelTrades">0</span><span class="ustat-label">Trades</span></div>
-        <div class="ustat"><span class="ustat-num" id="panelRating">—</span><span class="ustat-label">Rating</span></div>
-        <div class="ustat"><span class="ustat-num" id="panelPlatinum">0</span><span class="ustat-label">Platinum</span></div>
-      </div>
-      <!-- Become Seller CTA -->
-      <div id="becomeSellerSection">
-        <div class="become-seller-banner">
-          <span class="bs-icon">🏪</span>
-          <div>
-            <p class="bs-title">Become a Seller</p>
-            <p class="bs-desc">List your Platinum and earn from the community marketplace.</p>
+  function initStarPicker(uid) {
+    selectedStars = 0;
+    document.querySelectorAll('.star-btn').forEach(btn => {
+      btn.addEventListener('mouseenter', () => highlightStars(+btn.dataset.star));
+      btn.addEventListener('mouseleave', () => highlightStars(selectedStars));
+      btn.addEventListener('click', () => { selectedStars = +btn.dataset.star; highlightStars(selectedStars); });
+    });
+  }
+
+  function highlightStars(n) {
+    document.querySelectorAll('.star-btn').forEach(btn => {
+      btn.classList.toggle('active', +btn.dataset.star <= n);
+    });
+  }
+
+  function submitOpinion(uid) {
+    const from = document.getElementById('opinionFrom').value.trim();
+    const text = document.getElementById('opinionText').value.trim();
+    const fb   = document.getElementById('opinionFeedback');
+    if (!from) { fb.innerHTML = '<div style="color:#f87171;font-family:Rajdhani,sans-serif;font-size:.85rem;margin-top:6px">Ingresá tu nombre de usuario.</div>'; return; }
+    if (!text) { fb.innerHTML = '<div style="color:#f87171;font-family:Rajdhani,sans-serif;font-size:.85rem;margin-top:6px">Escribí tu opinión.</div>'; return; }
+    if (!selectedStars) { fb.innerHTML = '<div style="color:#f87171;font-family:Rajdhani,sans-serif;font-size:.85rem;margin-top:6px">Seleccioná una puntuación.</div>'; return; }
+
+    const user = users.find(u => u.id === uid);
+    if (!user) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const newOp = { from, stars: selectedStars, text, date: today };
+    if (!user.opinions) user.opinions = [];
+    user.opinions.unshift(newOp);
+
+    document.getElementById('opinionSubmit').disabled = true;
+    fb.innerHTML = `<div class="opinion-success">✔ Opinión publicada. Para guardarla permanentemente, actualizá tu users.json en GitHub.</div>`;
+
+    // re-render opinions tab
+    const opList = document.querySelector('#ptab-opinions .opinion-list');
+    if (opList) {
+      opList.innerHTML = user.opinions.map(op => `
+        <div class="opinion-item">
+          <div class="opinion-top">
+            <span class="opinion-from">${esc(op.from)}</span>
+            <span class="opinion-stars">${'★'.repeat(op.stars||5)}</span>
+            <span class="opinion-date">${op.date||''}</span>
           </div>
-        </div>
-        <div class="seller-perks">
-          <span class="perk">✅ Create listings</span>
-          <span class="perk">💬 Chat with buyers</span>
-          <span class="perk">⭐ Build reputation</span>
-          <span class="perk">📊 Transaction history</span>
-        </div>
-        <button class="btn-modal-primary" id="becomeSellerBtn">🏪 Activate Seller Mode</button>
-      </div>
-      <!-- Seller Dashboard (shown after activation) -->
-      <div id="sellerDashboard" style="display:none;">
-        <p class="seller-dash-title">🏪 Seller Dashboard</p>
-        <button class="btn-modal-primary" id="openCreateListing">+ Create New Listing</button>
-        <div id="myListings" class="my-listings"></div>
-      </div>
-      <button class="btn-logout" id="logoutBtn">Logout</button>
-    </div>
-  </div>
+          <div class="opinion-text">${esc(op.text)}</div>
+        </div>`).join('');
+    }
+  }
 
-  <!-- ===== CREATE LISTING MODAL ===== -->
-  <div class="modal-overlay" id="createListingModal">
-    <div class="modal-box">
-      <button class="modal-close" id="closeCreateListing">✕</button>
-      <h3 class="modal-title">💎 New Platinum Listing</h3>
-      <div class="form-group">
-        <label>Amount of Platinum</label>
-        <input type="number" id="listingAmount" placeholder="e.g. 500" min="1" />
-      </div>
-      <div class="form-group">
-        <label>Price per unit (points)</label>
-        <input type="number" id="listingPrice" placeholder="e.g. 10" min="1" />
-      </div>
-      <div class="form-group">
-        <label>Description / Terms</label>
-        <textarea id="listingDesc" placeholder="e.g. Fast delivery, in-game trade, safe deal..." rows="3"></textarea>
-      </div>
-      <button class="btn-modal-primary" id="submitListing">Publish Listing</button>
-      <p class="modal-msg" id="listingMsg"></p>
-    </div>
-  </div>
+  // ---------- MODALS ----------
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (id === 'modalMarket')  renderMarket();
+    if (id === 'modalVendors') renderVendors();
+    if (id === 'modalBuild')   renderBuilds();
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeAllModals() {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+    document.body.style.overflow = '';
+  }
 
-  <!-- ===== CHAT MODAL ===== -->
-  <div class="modal-overlay" id="chatModal">
-    <div class="modal-box chat-modal-box">
-      <button class="modal-close" id="closeChatModal">✕</button>
-      <div class="chat-header">
-        <span class="chat-seller-avatar" id="chatSellerAvatar">⚔️</span>
-        <div>
-          <p class="chat-seller-name" id="chatSellerName">Seller</p>
-          <p class="chat-listing-info" id="chatListingInfo">Platinum listing</p>
-        </div>
-      </div>
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-input-row">
-        <input type="text" id="chatInput" placeholder="Type a message..." />
-        <button id="sendChatMsg">➤</button>
-      </div>
-      <div class="chat-actions">
-        <button class="btn-offer" id="makeOfferBtn">💰 Make Offer</button>
-        <button class="btn-confirm-trade" id="confirmTradeBtn">✅ Confirm Trade</button>
-      </div>
-    </div>
-  </div>
+  // ---------- UTIL ----------
+  function esc(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
-  <!-- ===== REVIEW MODAL ===== -->
-  <div class="modal-overlay" id="reviewModal">
-    <div class="modal-box">
-      <button class="modal-close" id="closeReviewModal">✕</button>
-      <h3 class="modal-title">⭐ Leave a Review</h3>
-      <p class="review-for" id="reviewForLabel">Reviewing: Seller</p>
-      <div class="star-picker" id="starPicker">
-        <span class="star" data-val="1">★</span>
-        <span class="star" data-val="2">★</span>
-        <span class="star" data-val="3">★</span>
-        <span class="star" data-val="4">★</span>
-        <span class="star" data-val="5">★</span>
-      </div>
-      <div class="form-group">
-        <label>Comment</label>
-        <textarea id="reviewComment" placeholder="Describe your experience..." rows="3"></textarea>
-      </div>
-      <button class="btn-modal-primary" id="submitReview">Submit Review</button>
-      <p class="modal-msg" id="reviewMsg"></p>
-    </div>
-  </div>
+  // ---------- DEMO DATA (fallback) ----------
+  const DEMO_USERS = [
+    { id:'u001', username:'DarkLord_99', class:'Asesino', status:'online', avatar:'⚔️', trades:2341, rating:5.0,
+      items:[{name:'Espada del Vacío',rarity:'Legendario',price:4500,icon:'⚔️'},{name:'Daga de Sombras',rarity:'Épico',price:1800,icon:'🗡️'}],
+      builds:[{title:'Asesino Full Crítico',dps:'Extremo',def:'Baja',difficulty:'Alta',tags:['PvP','Solo','Crítico']}],
+      opinions:[{from:'RuneMaster',stars:5,text:'Trade rápido y seguro, recomendado 100%.',date:'2026-06-01'}] },
+    { id:'u002', username:'IronSmith_X', class:'Guerrero', status:'online', avatar:'🔨', trades:1872, rating:4.9,
+      items:[{name:'Casco de Hierro Negro',rarity:'Épico',price:1200,icon:'🪖'}],
+      builds:[{title:'Guerrero Berserker',dps:'Muy alto',def:'Media',difficulty:'Media',tags:['PvE','Boss']}],
+      opinions:[{from:'NightWarden',stars:5,text:'Muy buena experiencia.',date:'2026-06-03'}] },
+    { id:'u003', username:'RuneMaster', class:'Mago', status:'away', avatar:'🪄', trades:943, rating:4.95,
+      items:[{name:'Báculo de Runas',rarity:'Raro',price:870,icon:'🪄'}],
+      builds:[{title:'Mago AoE Devastador',dps:'Alto',def:'Muy baja',difficulty:'Media',tags:['PvE','Dungeon','AoE']}],
+      opinions:[] },
+    { id:'u004', username:'NightWarden', class:'Paladín', status:'online', avatar:'🌙', trades:711, rating:4.91,
+      items:[{name:'Poción de Vida Mayor',rarity:'Común',price:50,icon:'🧪'},{name:'Escudo Sagrado',rarity:'Épico',price:2200,icon:'🛡️'}],
+      builds:[{title:'Tanque Inmortal',dps:'Bajo',def:'Extrema',difficulty:'Media',tags:['PvE','Raid','Support']}],
+      opinions:[] },
+    { id:'u005', username:'StormArrow', class:'Arquero', status:'online', avatar:'🏹', trades:589, rating:4.88,
+      items:[{name:'Arco de Tormenta',rarity:'Épico',price:2100,icon:'🏹'}],
+      builds:[{title:'Arquero Hit & Run',dps:'Alto',def:'Media',difficulty:'Baja',tags:['PvP','Movilidad']}],
+      opinions:[] },
+    { id:'u006', username:'ShadowBlade', class:'Asesino', status:'away', avatar:'🗡️', trades:1204, rating:4.93,
+      items:[{name:'Guantes de Sombra',rarity:'Raro',price:640,icon:'🧤'}],
+      builds:[{title:'Asesino Burst PvP',dps:'Extremo',def:'Muy baja',difficulty:'Alta',tags:['PvP','Burst']}],
+      opinions:[] },
+    { id:'u007', username:'VoidKnight', class:'Paladín', status:'offline', avatar:'🛡️', trades:430, rating:4.85,
+      items:[{name:'Escudo del Guardián',rarity:'Legendario',price:3800,icon:'🛡️'}],
+      builds:[], opinions:[] },
+    { id:'u008', username:'FrostWitch', class:'Maga', status:'online', avatar:'❄️', trades:815, rating:4.97,
+      items:[{name:'Amuleto de Gelo',rarity:'Épico',price:1750,icon:'❄️'}],
+      builds:[{title:'Maga de Hielo Support',dps:'Medio',def:'Baja',difficulty:'Media',tags:['PvE','Support']}],
+      opinions:[{from:'RuneMaster',stars:5,text:'Increíble, muy confiable.',date:'2026-06-05'}] }
+  ];
 
-  <!-- ===== HERO ===== -->
-  <header class="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Welcome to the</p>
-      <h1 class="hero-title">
-        <span class="title-line">AURCUS</span>
-        <span class="title-line accent">ONLINE</span>
-      </h1>
-      <p class="hero-subtitle">Community Hub — Trade · Build · Conquer</p>
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-num" data-target="12480">0</span>
-          <span class="stat-label">Members</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-num" data-target="3842">0</span>
-          <span class="stat-label">Active Traders</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-num" data-target="98">0</span>
-          <span class="stat-label">Builds Listed</span>
-        </div>
-      </div>
-      <div class="hero-cta">
-        <a href="#platinum-market" class="btn-primary">💎 Platinum Market</a>
-        <a href="#help" class="btn-ghost">Help Gate</a>
-      </div>
-    </div>
-    <div class="hero-deco">
-      <div class="deco-ring ring1"></div>
-      <div class="deco-ring ring2"></div>
-      <div class="deco-ring ring3"></div>
-    </div>
-  </header>
+  // ---------- INIT ----------
+  function init() {
+    // modal close buttons
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => closeModal(btn.dataset.modal));
+    });
+    document.querySelectorAll('.modal-overlay').forEach(ov => {
+      ov.addEventListener('click', e => { if(e.target===ov) closeModal(ov.id); });
+    });
 
-  <!-- ===== MAIN CONTENT ===== -->
-  <main class="main-content">
+    // card / drawer / hero triggers
+    document.getElementById('cardMarket').addEventListener('click', e=>{e.preventDefault();openModal('modalMarket');});
+    document.getElementById('cardVendors').addEventListener('click',e=>{e.preventDefault();openModal('modalVendors');});
+    document.getElementById('cardBuild').addEventListener('click',  e=>{e.preventDefault();openModal('modalBuild');});
+    document.getElementById('drawerMarket').addEventListener('click',e=>{e.preventDefault();openModal('modalMarket');});
+    document.getElementById('drawerVendors').addEventListener('click',e=>{e.preventDefault();openModal('modalVendors');});
+    document.getElementById('drawerBuild').addEventListener('click', e=>{e.preventDefault();openModal('modalBuild');});
+    document.getElementById('heroMarketBtn').addEventListener('click',e=>{e.preventDefault();openModal('modalMarket');});
+    document.getElementById('footerMarket').addEventListener('click', e=>{e.preventDefault();openModal('modalMarket');});
 
-    <!-- ALERT BANNER -->
-    <div class="alert-banner">
-      <span class="alert-icon">⚡</span>
-      <span class="alert-text">EVENT ACTIVE: Double Drop Weekend — Ends in <span id="countdown">23:59:59</span></span>
-    </div>
+    // market pills
+    document.getElementById('marketPills').addEventListener('click', e => {
+      const pill = e.target.closest('.pill'); if (!pill) return;
+      document.querySelectorAll('#marketPills .pill').forEach(p=>p.classList.remove('active'));
+      pill.classList.add('active');
+      mktFilter = pill.dataset.rarity;
+      renderMarket();
+    });
 
-    <!-- QUICK CARDS -->
-    <section class="cards-section">
-      <div class="section-label">Quick Access</div>
-      <div class="cards-grid">
+    // vendor pills
+    document.getElementById('vendorPills').addEventListener('click', e => {
+      const pill = e.target.closest('.pill'); if (!pill) return;
+      document.querySelectorAll('#vendorPills .pill').forEach(p=>p.classList.remove('active'));
+      pill.classList.add('active');
+      vendorFilter = pill.dataset.status;
+      renderVendors();
+    });
 
-        <a href="#platinum-market" class="card" id="market">
-          <div class="card-bg card-bg--market"></div>
-          <div class="card-icon">💎</div>
-          <h3 class="card-title">Platinum Market</h3>
-          <p class="card-desc">Buy & sell Platinum directly with real community members.</p>
-          <span class="card-link">Browse →</span>
-        </a>
+    // search on enter
+    document.getElementById('marketSearch').addEventListener('keyup', e=>{ if(e.key==='Enter') renderMarket(); });
+    document.getElementById('vendorSearch').addEventListener('keyup', e=>{ if(e.key==='Enter') renderVendors(); });
+    document.getElementById('buildSearch').addEventListener('keyup',  e=>{ if(e.key==='Enter') renderBuilds(); });
 
-        <a href="#" class="card" id="seller" onclick="openUserPanelOrAuth(event)">
-          <div class="card-bg card-bg--seller"></div>
-          <div class="card-icon">🏪</div>
-          <h3 class="card-title">Seller Hub</h3>
-          <p class="card-desc">Register & activate seller mode to publish your listings.</p>
-          <span class="card-link">Start Selling →</span>
-        </a>
+    loadConfig();
+    // if no config, use demo data
+    if (!cfg.token) { users = DEMO_USERS; onUsersLoaded(); }
+  }
 
-        <a href="#infobuild" class="card" id="infobuild">
-          <div class="card-bg card-bg--build"></div>
-          <div class="card-icon">🛡</div>
-          <h3 class="card-title">Info Build</h3>
-          <p class="card-desc">Explore the best character builds shared by top players.</p>
-          <span class="card-link">View Builds →</span>
-        </a>
+  return { init, saveConfig, filterMarket, filterVendors, filterBuilds, openProfile, submitOpinion };
+})();
 
-        <a href="#reliable" class="card" id="reliable">
-          <div class="card-bg card-bg--reliable"></div>
-          <div class="card-icon">✅</div>
-          <h3 class="card-title">Reliable Seller</h3>
-          <p class="card-desc">Verified & trusted traders — safe trades guaranteed.</p>
-          <span class="card-link">See Verified →</span>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ===== PLATINUM P2P MARKETPLACE ===== -->
-    <section class="section-block platinum-section" id="platinum-market">
-      <div class="section-header">
-        <span class="sh-icon">💎</span>
-        <div>
-          <h2 class="sh-title">Platinum Marketplace</h2>
-          <p class="sh-sub">Real listings from real players — P2P trading with reputation system</p>
-        </div>
-      </div>
-
-      <!-- Filters -->
-      <div class="market-filters">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="verified">✅ Verified Only</button>
-        <button class="filter-btn" data-filter="cheap">💰 Cheapest</button>
-        <button class="filter-btn" data-filter="most">📦 Most Platinum</button>
-      </div>
-
-      <!-- Listings container -->
-      <div class="listings-grid" id="listingsGrid">
-        <!-- Populated by JS -->
-      </div>
-
-      <p class="no-listings-msg" id="noListingsMsg" style="display:none;">
-        No listings yet. Be the first to sell Platinum!
-      </p>
-    </section>
-
-    <!-- HELP GATE -->
-    <section class="section-block" id="help">
-      <div class="section-header">
-        <span class="sh-icon">❓</span>
-        <div>
-          <h2 class="sh-title">Help Gate</h2>
-          <p class="sh-sub">Guides, FAQs & Support for the community</p>
-        </div>
-      </div>
-      <div class="help-grid">
-        <div class="help-card">
-          <span class="hc-num">01</span>
-          <h4>Getting Started</h4>
-          <p>New to Aurcus Online? Check our beginner guide and first steps.</p>
-        </div>
-        <div class="help-card">
-          <span class="hc-num">02</span>
-          <h4>Trading Rules</h4>
-          <p>Read the market regulations before your first trade.</p>
-        </div>
-        <div class="help-card">
-          <span class="hc-num">03</span>
-          <h4>Report a Scam</h4>
-          <p>Encountered a fraudulent seller? Report it here.</p>
-        </div>
-        <div class="help-card">
-          <span class="hc-num">04</span>
-          <h4>Contact Mods</h4>
-          <p>Reach out to our moderation team for any issue.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- RELIABLE SELLERS -->
-    <section class="section-block" id="reliable">
-      <div class="section-header">
-        <span class="sh-icon">✅</span>
-        <div>
-          <h2 class="sh-title">Reliable Sellers</h2>
-          <p class="sh-sub">Verified by the community — trade with confidence</p>
-        </div>
-      </div>
-      <div class="sellers-list" id="reliableSellers">
-        <!-- Static defaults + dynamic injection -->
-        <div class="seller-row">
-          <span class="seller-rank gold">★ GOLD</span>
-          <span class="seller-name">DarkLord_99</span>
-          <span class="seller-trades">2,341 trades</span>
-          <span class="seller-rate">100% ✔</span>
-        </div>
-        <div class="seller-row">
-          <span class="seller-rank gold">★ GOLD</span>
-          <span class="seller-name">IronSmith_X</span>
-          <span class="seller-trades">1,872 trades</span>
-          <span class="seller-rate">99.8% ✔</span>
-        </div>
-        <div class="seller-row">
-          <span class="seller-rank silver">✦ SILVER</span>
-          <span class="seller-name">RuneMaster</span>
-          <span class="seller-trades">943 trades</span>
-          <span class="seller-rate">99.5% ✔</span>
-        </div>
-        <div class="seller-row">
-          <span class="seller-rank silver">✦ SILVER</span>
-          <span class="seller-name">NightWarden</span>
-          <span class="seller-trades">711 trades</span>
-          <span class="seller-rate">99.1% ✔</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- RANKINGS -->
-    <section class="section-block" id="rankings">
-      <div class="section-header">
-        <span class="sh-icon">🏆</span>
-        <div>
-          <h2 class="sh-title">Rankings</h2>
-          <p class="sh-sub">Top players this season</p>
-        </div>
-      </div>
-      <div class="rank-table">
-        <div class="rank-row rank-row--header">
-          <span>#</span><span>Player</span><span>Class</span><span>Score</span>
-        </div>
-        <div class="rank-row rank-1">
-          <span>🥇 1</span><span>ShadowBlade</span><span>Assassin</span><span>98,400</span>
-        </div>
-        <div class="rank-row rank-2">
-          <span>🥈 2</span><span>VoidKnight</span><span>Paladin</span><span>91,220</span>
-        </div>
-        <div class="rank-row rank-3">
-          <span>🥉 3</span><span>FrostWitch</span><span>Mage</span><span>87,550</span>
-        </div>
-        <div class="rank-row">
-          <span>4</span><span>StormArrow</span><span>Archer</span><span>81,300</span>
-        </div>
-        <div class="rank-row">
-          <span>5</span><span>IronFist</span><span>Warrior</span><span>78,900</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- EVENTS -->
-    <section class="section-block" id="events">
-      <div class="section-header">
-        <span class="sh-icon">⚡</span>
-        <div>
-          <h2 class="sh-title">Active Events</h2>
-          <p class="sh-sub">Don't miss out on limited-time opportunities</p>
-        </div>
-      </div>
-      <div class="events-grid">
-        <div class="event-card event--active">
-          <span class="event-tag">LIVE</span>
-          <h4>Double Drop Weekend</h4>
-          <p>All dungeons drop double loot until Sunday midnight.</p>
-        </div>
-        <div class="event-card event--soon">
-          <span class="event-tag soon">SOON</span>
-          <h4>Guild Wars Season 3</h4>
-          Massive guild vs guild tournament. Registration opens Monday.</p>
-        </div>
-        <div class="event-card event--soon">
-          <span class="event-tag soon">SOON</span>
-          <h4>Rare Auction</h4>
-          <p>Bid on legendary items — June 15th only.</p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-logo">⚔ AURCUS ONLINE</div>
-    <p class="footer-text">Community-run hub. Not affiliated with official developers.</p>
-    <div class="footer-links">
-      <a href="#help">Help</a>
-      <a href="#platinum-market">Market</a>
-      <a href="#rankings">Rankings</a>
-      <a href="#community">Community</a>
-    </div>
-    <p class="footer-copy">© 2026 Aurcus Community Hub</p>
-  </footer>
-
-  <script src="script.js"></script>
+document.addEventListener('DOMContentLoaded', App.init);
+</script>
 </body>
 </html>
