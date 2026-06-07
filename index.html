@@ -599,9 +599,10 @@ const App = (() => {
   }
 
   function updateHeroStats() {
-    const online = users.filter(u => u.status === 'online').length;
-    const items  = users.reduce((a, u) => a + (u.items?.length || 0), 0);
-    animNum(document.getElementById('statMembers'), users.length);
+    const vendedores = getVendedores();
+    const online = vendedores.filter(u => u.status === 'online').length;
+    const items  = vendedores.reduce((a, u) => a + (u.items?.length || 0), 0);
+    animNum(document.getElementById('statMembers'), vendedores.length);
     animNum(document.getElementById('statOnline'),  online);
     animNum(document.getElementById('statItems'),   items);
     document.getElementById('onlineBadge').textContent = `● ${online} Online`;
@@ -610,11 +611,11 @@ const App = (() => {
   // ---------- RELIABLE ----------
   function renderReliable() {
     const el = document.getElementById('reliableList');
-    const sorted = [...users].sort((a,b) => (b.trades||0)-(a.trades||0)).slice(0,4);
+    const sorted = [...getVendedores()].sort((a,b) => (b.trades||0)-(a.trades||0)).slice(0,4);
     el.innerHTML = sorted.map(u => `
       <div class="seller-row" onclick="App.openProfile('${u.id}')" style="cursor:pointer">
         <span class="seller-rank ${u.trades>1500?'gold':'silver'}">${u.trades>1500?'★ ORO':'✦ PLATA'}</span>
-        <span class="seller-name">${esc(u.username)}</span>
+        <span class="seller-name">${esc(u.username||u.nombre||'?')}</span>
         <span class="seller-trades">${(u.trades||0).toLocaleString()} trades</span>
         <span class="seller-rate">${u.rating||'?'}% ✔</span>
       </div>`).join('');
@@ -623,13 +624,13 @@ const App = (() => {
   // ---------- RANKINGS ----------
   function renderRankings() {
     const el = document.getElementById('rankTable');
-    const sorted = [...users].sort((a,b) => (b.trades||0)-(a.trades||0));
+    const sorted = [...getVendedores()].sort((a,b) => (b.trades||0)-(a.trades||0));
     const medals = ['🥇','🥈','🥉'];
     el.innerHTML = `<div class="rank-row rank-row--header"><span>#</span><span>Jugador</span><span>Clase</span><span>Trades</span></div>` +
       sorted.map((u,i) => `
         <div class="rank-row ${i<3?'rank-'+(i+1):''}" onclick="App.openProfile('${u.id}')" style="cursor:pointer">
           <span>${medals[i]||i+1}</span>
-          <span>${esc(u.username)}</span>
+          <span>${esc(u.username||u.nombre||'?')}</span>
           <span>${esc(u.class||'—')}</span>
           <span>${(u.trades||0).toLocaleString()}</span>
         </div>`).join('');
@@ -640,11 +641,14 @@ const App = (() => {
   function renderMarket() {
     const q = document.getElementById('marketSearch').value.toLowerCase();
     const el = document.getElementById('itemList');
+    const vendedores = getVendedores();
     let rows = [];
-    users.forEach(u => {
+    vendedores.forEach(u => {
       (u.items||[]).forEach(item => {
         if (mktFilter !== 'all' && item.rarity !== mktFilter) return;
-        if (q && !item.name.toLowerCase().includes(q) && !u.username.toLowerCase().includes(q)) return;
+        const name  = (item.name||'').toLowerCase();
+        const uname = (u.username||u.nombre||'').toLowerCase();
+        if (q && !name.includes(q) && !uname.includes(q)) return;
         rows.push({ item, user: u });
       });
     });
@@ -654,7 +658,7 @@ const App = (() => {
         <div class="item-icon">${item.icon||'📦'}</div>
         <div class="item-info">
           <div class="item-name">${esc(item.name)}</div>
-          <div class="item-seller">Vendedor: <span onclick="App.openProfile('${user.id}')">${esc(user.username)}</span></div>
+          <div class="item-seller">Vendedor: <span onclick="App.openProfile('${user.id}')">${esc(user.username||user.nombre||'?')}</span></div>
         </div>
         <span class="item-badge badge--${item.rarity}">${item.rarity}</span>
         <div class="item-price">${item.price?.toLocaleString()||'?'} G</div>
@@ -665,15 +669,24 @@ const App = (() => {
 
   // ---------- RENDER VENDORS ----------
   let vendorFilter = 'all';
+  // Helper: obtener solo usuarios vendedores (campo vendedor:true, o todos si ninguno lo tiene)
+  function getVendedores() {
+    const conCampo = users.filter(u => u.vendedor === true);
+    // Si hay al menos uno con el campo activado, mostrar solo esos.
+    // Si nadie tiene el campo aún (sistema viejo), mostrar todos para compatibilidad.
+    return conCampo.length > 0 ? conCampo : users;
+  }
+
   function renderVendors() {
     const q = document.getElementById('vendorSearch').value.toLowerCase();
     const el = document.getElementById('vendorList');
-    let list = users.filter(u => {
+    const vendedores = getVendedores();
+    let list = vendedores.filter(u => {
       if (vendorFilter !== 'all' && u.status !== vendorFilter) return false;
-      if (q && !u.username.toLowerCase().includes(q)) return false;
+      if (q && !(u.username||'').toLowerCase().includes(q)) return false;
       return true;
     });
-    if (!list.length) { el.innerHTML = `<div class="modal-loading">No se encontraron usuarios.</div>`; return; }
+    if (!list.length) { el.innerHTML = `<div class="modal-loading">No se encontraron vendedores.</div>`; return; }
     el.innerHTML = list.map(u => {
       const stars = '★'.repeat(Math.round(u.rating||5)) + '☆'.repeat(5-Math.round(u.rating||5));
       const statusLabel = { online:'● Online', away:'◐ Ausente', offline:'○ Offline' }[u.status]||u.status;
@@ -681,11 +694,11 @@ const App = (() => {
       <div class="vendor-card" onclick="App.openProfile('${u.id}')">
         <div class="vendor-avatar">${u.avatar||'👤'}</div>
         <div class="vendor-info">
-          <div class="vendor-name">${esc(u.username)}</div>
+          <div class="vendor-name">${esc(u.username||u.nombre||'?')}</div>
           <div class="vendor-meta">Clase: <span>${esc(u.class||'?')}</span> · Ítems: <span>${(u.items||[]).length}</span> · Trades: <span>${(u.trades||0).toLocaleString()}</span></div>
         </div>
         <div class="vendor-right">
-          <span class="vendor-status status--${u.status}">${statusLabel}</span>
+          <span class="vendor-status status--${u.status||'offline'}">${statusLabel}</span>
           <span class="vendor-stars">${stars} ${u.rating||'?'}</span>
         </div>
       </div>`;
@@ -699,9 +712,12 @@ const App = (() => {
     const q = document.getElementById('buildSearch').value.toLowerCase();
     const el = document.getElementById('buildList');
     let rows = [];
-    users.forEach(u => {
+    getVendedores().forEach(u => {
       (u.builds||[]).forEach(b => {
-        if (q && !b.title.toLowerCase().includes(q) && !u.class.toLowerCase().includes(q) && !u.username.toLowerCase().includes(q)) return;
+        const t  = (b.title||'').toLowerCase();
+        const cl = (u.class||'').toLowerCase();
+        const un = (u.username||u.nombre||'').toLowerCase();
+        if (q && !t.includes(q) && !cl.includes(q) && !un.includes(q)) return;
         rows.push({ build: b, user: u });
       });
     });
@@ -713,7 +729,7 @@ const App = (() => {
           <span class="build-class-icon">${classIcons[user.class]||'⚔️'}</span>
           <div class="build-title-wrap">
             <div class="build-title">${esc(build.title)}</div>
-            <div class="build-author">por <span>${esc(user.username)}</span> · ${esc(user.class||'?')}</div>
+            <div class="build-author">por <span>${esc(user.username||user.nombre||'?')}</span> · ${esc(user.class||'?')}</div>
           </div>
         </div>
         <div class="build-stats-bar">
