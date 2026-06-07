@@ -24,13 +24,12 @@
       <span class="logo-text">AURCUS</span>
       <span class="logo-sub">ONLINE</span>
     </div>
-
-    <!-- HAMBURGER MENU -->
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+    <div class="nav-right">
+      <button class="btn-become-seller" id="openAuthModal">👤 Login / Register</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 
   <!-- ===== SIDE DRAWER MENU ===== -->
@@ -41,85 +40,215 @@
       <button class="drawer-close" id="drawerClose">✕</button>
     </div>
     <nav class="drawer-nav">
-
       <a href="#help" class="drawer-item" data-section="help">
         <span class="d-icon">❓</span>
-        <div class="d-info">
-          <span class="d-title">Help Gate</span>
-          <span class="d-desc">Support & guides</span>
-        </div>
+        <div class="d-info"><span class="d-title">Help Gate</span><span class="d-desc">Support & guides</span></div>
         <span class="d-arrow">›</span>
       </a>
-
-      <a href="#seller" class="drawer-item" data-section="seller">
-        <span class="d-icon">🏪</span>
-        <div class="d-info">
-          <span class="d-title">Seller</span>
-          <span class="d-desc">Sell your items</span>
-        </div>
+      <a href="#platinum-market" class="drawer-item" data-section="platinum-market">
+        <span class="d-icon">💎</span>
+        <div class="d-info"><span class="d-title">Platinum Market</span><span class="d-desc">Buy & sell platinum P2P</span></div>
         <span class="d-arrow">›</span>
       </a>
-
       <a href="#market" class="drawer-item" data-section="market">
         <span class="d-icon">💰</span>
-        <div class="d-info">
-          <span class="d-title">Market</span>
-          <span class="d-desc">Browse listings</span>
-        </div>
+        <div class="d-info"><span class="d-title">Market</span><span class="d-desc">Browse listings</span></div>
         <span class="d-arrow">›</span>
       </a>
-
       <a href="#infobuild" class="drawer-item" data-section="infobuild">
         <span class="d-icon">🛡</span>
-        <div class="d-info">
-          <span class="d-title">Info Build</span>
-          <span class="d-desc">Character builds</span>
-        </div>
+        <div class="d-info"><span class="d-title">Info Build</span><span class="d-desc">Character builds</span></div>
         <span class="d-arrow">›</span>
       </a>
-
       <a href="#reliable" class="drawer-item" data-section="reliable">
         <span class="d-icon">✅</span>
-        <div class="d-info">
-          <span class="d-title">Reliable Seller</span>
-          <span class="d-desc">Verified traders</span>
-        </div>
+        <div class="d-info"><span class="d-title">Reliable Seller</span><span class="d-desc">Verified traders</span></div>
         <span class="d-arrow">›</span>
       </a>
-
       <a href="#rankings" class="drawer-item" data-section="rankings">
         <span class="d-icon">🏆</span>
-        <div class="d-info">
-          <span class="d-title">Rankings</span>
-          <span class="d-desc">Top players</span>
-        </div>
+        <div class="d-info"><span class="d-title">Rankings</span><span class="d-desc">Top players</span></div>
         <span class="d-arrow">›</span>
       </a>
-
       <a href="#events" class="drawer-item" data-section="events">
         <span class="d-icon">⚡</span>
-        <div class="d-info">
-          <span class="d-title">Events</span>
-          <span class="d-desc">Active events</span>
-        </div>
+        <div class="d-info"><span class="d-title">Events</span><span class="d-desc">Active events</span></div>
         <span class="d-arrow">›</span>
       </a>
-
       <a href="#community" class="drawer-item" data-section="community">
         <span class="d-icon">👥</span>
-        <div class="d-info">
-          <span class="d-title">Community</span>
-          <span class="d-desc">Forums & chat</span>
-        </div>
+        <div class="d-info"><span class="d-title">Community</span><span class="d-desc">Forums & chat</span></div>
         <span class="d-arrow">›</span>
       </a>
-
     </nav>
-
     <div class="drawer-footer">
       <span class="online-badge">● 1,247 Online</span>
     </div>
   </aside>
+
+  <!-- ===== MODAL AUTH (Login / Register) ===== -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeAuthModal">✕</button>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login">Login</button>
+        <button class="modal-tab" data-tab="register">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="tab-panel active" id="tab-login">
+        <h3 class="modal-title">⚔ Welcome Back</h3>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="loginUsername" placeholder="Your username" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" />
+        </div>
+        <button class="btn-modal-primary" id="loginBtn">Login</button>
+        <p class="modal-msg" id="loginMsg"></p>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="tab-panel" id="tab-register">
+        <h3 class="modal-title">⚔ Join Aurcus</h3>
+        <div class="avatar-picker">
+          <p class="avatar-label">Choose your avatar:</p>
+          <div class="avatar-options">
+            <span class="avatar-opt selected" data-av="⚔️">⚔️</span>
+            <span class="avatar-opt" data-av="🛡️">🛡️</span>
+            <span class="avatar-opt" data-av="🧙">🧙</span>
+            <span class="avatar-opt" data-av="🏹">🏹</span>
+            <span class="avatar-opt" data-av="💀">💀</span>
+            <span class="avatar-opt" data-av="🐉">🐉</span>
+            <span class="avatar-opt" data-av="🔱">🔱</span>
+            <span class="avatar-opt" data-av="⚡">⚡</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="regUsername" placeholder="Choose a username" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Min 6 characters" />
+        </div>
+        <button class="btn-modal-primary" id="registerBtn">Create Account</button>
+        <p class="modal-msg" id="registerMsg"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== USER PANEL (when logged in) ===== -->
+  <div class="modal-overlay" id="userPanel">
+    <div class="modal-box user-panel-box">
+      <button class="modal-close" id="closeUserPanel">✕</button>
+      <div class="user-panel-header">
+        <span class="user-panel-avatar" id="panelAvatar">⚔️</span>
+        <div>
+          <p class="user-panel-name" id="panelName">Username</p>
+          <p class="user-panel-role" id="panelRole">Member</p>
+        </div>
+      </div>
+      <div class="user-stats-row">
+        <div class="ustat"><span class="ustat-num" id="panelTrades">0</span><span class="ustat-label">Trades</span></div>
+        <div class="ustat"><span class="ustat-num" id="panelRating">—</span><span class="ustat-label">Rating</span></div>
+        <div class="ustat"><span class="ustat-num" id="panelPlatinum">0</span><span class="ustat-label">Platinum</span></div>
+      </div>
+      <!-- Become Seller CTA -->
+      <div id="becomeSellerSection">
+        <div class="become-seller-banner">
+          <span class="bs-icon">🏪</span>
+          <div>
+            <p class="bs-title">Become a Seller</p>
+            <p class="bs-desc">List your Platinum and earn from the community marketplace.</p>
+          </div>
+        </div>
+        <div class="seller-perks">
+          <span class="perk">✅ Create listings</span>
+          <span class="perk">💬 Chat with buyers</span>
+          <span class="perk">⭐ Build reputation</span>
+          <span class="perk">📊 Transaction history</span>
+        </div>
+        <button class="btn-modal-primary" id="becomeSellerBtn">🏪 Activate Seller Mode</button>
+      </div>
+      <!-- Seller Dashboard (shown after activation) -->
+      <div id="sellerDashboard" style="display:none;">
+        <p class="seller-dash-title">🏪 Seller Dashboard</p>
+        <button class="btn-modal-primary" id="openCreateListing">+ Create New Listing</button>
+        <div id="myListings" class="my-listings"></div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <!-- ===== CREATE LISTING MODAL ===== -->
+  <div class="modal-overlay" id="createListingModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeCreateListing">✕</button>
+      <h3 class="modal-title">💎 New Platinum Listing</h3>
+      <div class="form-group">
+        <label>Amount of Platinum</label>
+        <input type="number" id="listingAmount" placeholder="e.g. 500" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Price per unit (points)</label>
+        <input type="number" id="listingPrice" placeholder="e.g. 10" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Description / Terms</label>
+        <textarea id="listingDesc" placeholder="e.g. Fast delivery, in-game trade, safe deal..." rows="3"></textarea>
+      </div>
+      <button class="btn-modal-primary" id="submitListing">Publish Listing</button>
+      <p class="modal-msg" id="listingMsg"></p>
+    </div>
+  </div>
+
+  <!-- ===== CHAT MODAL ===== -->
+  <div class="modal-overlay" id="chatModal">
+    <div class="modal-box chat-modal-box">
+      <button class="modal-close" id="closeChatModal">✕</button>
+      <div class="chat-header">
+        <span class="chat-seller-avatar" id="chatSellerAvatar">⚔️</span>
+        <div>
+          <p class="chat-seller-name" id="chatSellerName">Seller</p>
+          <p class="chat-listing-info" id="chatListingInfo">Platinum listing</p>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button id="sendChatMsg">➤</button>
+      </div>
+      <div class="chat-actions">
+        <button class="btn-offer" id="makeOfferBtn">💰 Make Offer</button>
+        <button class="btn-confirm-trade" id="confirmTradeBtn">✅ Confirm Trade</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== REVIEW MODAL ===== -->
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeReviewModal">✕</button>
+      <h3 class="modal-title">⭐ Leave a Review</h3>
+      <p class="review-for" id="reviewForLabel">Reviewing: Seller</p>
+      <div class="star-picker" id="starPicker">
+        <span class="star" data-val="1">★</span>
+        <span class="star" data-val="2">★</span>
+        <span class="star" data-val="3">★</span>
+        <span class="star" data-val="4">★</span>
+        <span class="star" data-val="5">★</span>
+      </div>
+      <div class="form-group">
+        <label>Comment</label>
+        <textarea id="reviewComment" placeholder="Describe your experience..." rows="3"></textarea>
+      </div>
+      <button class="btn-modal-primary" id="submitReview">Submit Review</button>
+      <p class="modal-msg" id="reviewMsg"></p>
+    </div>
+  </div>
 
   <!-- ===== HERO ===== -->
   <header class="hero">
@@ -148,7 +277,7 @@
         </div>
       </div>
       <div class="hero-cta">
-        <a href="#market" class="btn-primary">Enter Market</a>
+        <a href="#platinum-market" class="btn-primary">💎 Platinum Market</a>
         <a href="#help" class="btn-ghost">Help Gate</a>
       </div>
     </div>
@@ -159,7 +288,7 @@
     </div>
   </header>
 
-  <!-- ===== SECTIONS ===== -->
+  <!-- ===== MAIN CONTENT ===== -->
   <main class="main-content">
 
     <!-- ALERT BANNER -->
@@ -173,19 +302,19 @@
       <div class="section-label">Quick Access</div>
       <div class="cards-grid">
 
-        <a href="#market" class="card" id="market">
+        <a href="#platinum-market" class="card" id="market">
           <div class="card-bg card-bg--market"></div>
-          <div class="card-icon">💰</div>
-          <h3 class="card-title">Market</h3>
-          <p class="card-desc">Buy & sell items, gear, and rare drops with the community.</p>
+          <div class="card-icon">💎</div>
+          <h3 class="card-title">Platinum Market</h3>
+          <p class="card-desc">Buy & sell Platinum directly with real community members.</p>
           <span class="card-link">Browse →</span>
         </a>
 
-        <a href="#seller" class="card" id="seller">
+        <a href="#" class="card" id="seller" onclick="openUserPanelOrAuth(event)">
           <div class="card-bg card-bg--seller"></div>
           <div class="card-icon">🏪</div>
           <h3 class="card-title">Seller Hub</h3>
-          <p class="card-desc">List your items and manage your storefront.</p>
+          <p class="card-desc">Register & activate seller mode to publish your listings.</p>
           <span class="card-link">Start Selling →</span>
         </a>
 
@@ -206,6 +335,34 @@
         </a>
 
       </div>
+    </section>
+
+    <!-- ===== PLATINUM P2P MARKETPLACE ===== -->
+    <section class="section-block platinum-section" id="platinum-market">
+      <div class="section-header">
+        <span class="sh-icon">💎</span>
+        <div>
+          <h2 class="sh-title">Platinum Marketplace</h2>
+          <p class="sh-sub">Real listings from real players — P2P trading with reputation system</p>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="market-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="verified">✅ Verified Only</button>
+        <button class="filter-btn" data-filter="cheap">💰 Cheapest</button>
+        <button class="filter-btn" data-filter="most">📦 Most Platinum</button>
+      </div>
+
+      <!-- Listings container -->
+      <div class="listings-grid" id="listingsGrid">
+        <!-- Populated by JS -->
+      </div>
+
+      <p class="no-listings-msg" id="noListingsMsg" style="display:none;">
+        No listings yet. Be the first to sell Platinum!
+      </p>
     </section>
 
     <!-- HELP GATE -->
@@ -250,7 +407,8 @@
           <p class="sh-sub">Verified by the community — trade with confidence</p>
         </div>
       </div>
-      <div class="sellers-list">
+      <div class="sellers-list" id="reliableSellers">
+        <!-- Static defaults + dynamic injection -->
         <div class="seller-row">
           <span class="seller-rank gold">★ GOLD</span>
           <span class="seller-name">DarkLord_99</span>
@@ -327,7 +485,7 @@
         <div class="event-card event--soon">
           <span class="event-tag soon">SOON</span>
           <h4>Guild Wars Season 3</h4>
-          <p>Massive guild vs guild tournament. Registration opens Monday.</p>
+          Massive guild vs guild tournament. Registration opens Monday.</p>
         </div>
         <div class="event-card event--soon">
           <span class="event-tag soon">SOON</span>
@@ -345,7 +503,7 @@
     <p class="footer-text">Community-run hub. Not affiliated with official developers.</p>
     <div class="footer-links">
       <a href="#help">Help</a>
-      <a href="#market">Market</a>
+      <a href="#platinum-market">Market</a>
       <a href="#rankings">Rankings</a>
       <a href="#community">Community</a>
     </div>
