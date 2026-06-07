@@ -1180,4 +1180,179 @@
 
     function renderMarketItem(item, prepend = false) {
       const div = document.createElement('div');
-      div.className = 'market-item
+      div.className = 'market-item';
+      div.dataset.cat = item.category;
+      const rarityLabel = RARITY_LABELS[item.rarity] || item.rarity;
+      const rarityClass = RARITY_CLASS[item.rarity]  || 'rarity-rare';
+      div.innerHTML = `
+        <div class="item-rarity ${rarityClass}">${escapeHtml(rarityLabel)}</div>
+        <div class="item-name">${escapeHtml(item.item_name)}</div>
+        <div class="item-seller">por ${escapeHtml(item.nickname)} · ${timeAgoMarket(item.created_at)}</div>
+        <div class="item-price">${Number(item.price).toLocaleString()} <span class="item-price-unit">gold</span></div>
+      `;
+      if (prepend) marketGrid.insertBefore(div, marketGrid.firstChild);
+      else         marketGrid.appendChild(div);
+    }
+
+    function applyMarketFilter(cat) {
+      currentCategory = cat;
+      const items = marketGrid.querySelectorAll('.market-item');
+      items.forEach(el => {
+        el.style.display = (cat === 'Todo' || el.dataset.cat === cat) ? '' : 'none';
+      });
+    }
+
+    function showMarketStatus(msg, type) {
+      marketStatus.textContent = msg;
+      marketStatus.className = 'market-status ' + type;
+      setTimeout(() => { marketStatus.className = 'market-status'; }, 3500);
+    }
+
+    async function loadMarket() {
+      marketGrid.innerHTML = '<div class="market-loading" style="grid-column:1/-1">CARGANDO MARKET...</div>';
+      const { data, error } = await db
+        .from('market')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(60);
+
+      marketGrid.innerHTML = '';
+      if (error || !data || data.length === 0) {
+        marketGrid.innerHTML = '<div class="market-empty" style="grid-column:1/-1">💰 No hay items publicados aún. ¡Sé el primero!</div>';
+        return;
+      }
+      allMarketItems = data;
+      data.forEach(item => renderMarketItem(item));
+      applyMarketFilter(currentCategory);
+    }
+
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyMarketFilter(btn.dataset.cat || 'Todo');
+      });
+    });
+
+    // Modal open/close
+    document.getElementById('marketPublishBtn').addEventListener('click', () => {
+      marketModalOverlay.classList.add('open');
+    });
+    document.getElementById('marketModalCancel').addEventListener('click', () => {
+      marketModalOverlay.classList.remove('open');
+    });
+    marketModalOverlay.addEventListener('click', e => {
+      if (e.target === marketModalOverlay) marketModalOverlay.classList.remove('open');
+    });
+
+    // Modal submit
+    document.getElementById('marketModalSubmit').addEventListener('click', async () => {
+      const nick      = document.getElementById('mNick').value.trim();
+      const item_name = document.getElementById('mName').value.trim();
+      const category  = document.getElementById('mCat').value;
+      const rarity    = document.getElementById('mRarity').value;
+      const price     = parseInt(document.getElementById('mPrice').value);
+
+      if (!nick)           { showMarketStatus('⚠ Escribí tu nickname.', 'err'); return; }
+      if (!item_name)      { showMarketStatus('⚠ Escribí el nombre del item.', 'err'); return; }
+      if (!price || price < 1) { showMarketStatus('⚠ Ingresá un precio válido.', 'err'); return; }
+
+      const btn = document.getElementById('marketModalSubmit');
+      btn.disabled = true; btn.textContent = 'Publicando...';
+
+      const { error } = await db.from('market').insert({ nickname: nick, item_name, category, rarity, price });
+
+      btn.disabled = false; btn.textContent = 'Publicar';
+
+      if (error) {
+        showMarketStatus('❌ Error al publicar. Revisá la tabla en Supabase.', 'err');
+      } else {
+        marketModalOverlay.classList.remove('open');
+        document.getElementById('mNick').value  = '';
+        document.getElementById('mName').value  = '';
+        document.getElementById('mPrice').value = '';
+        showMarketStatus('✅ Item publicado exitosamente.', 'ok');
+      }
+    });
+
+    // Realtime market
+    db.channel('market-channel')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'market' }, payload => {
+        const empty = marketGrid.querySelector('.market-empty');
+        if (empty) empty.remove();
+        renderMarketItem(payload.new, true);
+      })
+      .subscribe();
+
+    loadMarket();
+
+    /* ============================================
+       SELLERS — SUPABASE
+       ============================================
+       Tabla esperada en Supabase:
+       CREATE TABLE sellers (
+         id bigserial primary key,
+         created_at timestamptz default now(),
+         nickname text not null,
+         avatar text default '⚔',
+         rank text default 'silver',   -- 'gold' | 'silver'
+         trades integer default 0,
+         positive_pct text default '100%',
+         seniority text default '1m'
+       );
+       ALTER TABLE sellers ENABLE ROW LEVEL SECURITY;
+       CREATE POLICY "anon read" ON sellers FOR SELECT USING (true);
+    ============================================ */
+
+    const sellersGrid = document.getElementById('sellersGrid');
+
+    function renderSeller(s) {
+      const div = document.createElement('div');
+      div.className = 'seller-card';
+      const rankClass = (s.rank === 'gold') ? 'gold' : 'silver';
+      const rankLabel = (s.rank === 'gold') ? '★ GOLD' : '✦ SILVER';
+      div.innerHTML = `
+        <div class="seller-card-top">
+          <div class="seller-avatar">${escapeHtml(s.avatar || '⚔')}</div>
+          <div>
+            <div class="seller-card-name">${escapeHtml(s.nickname)}</div>
+            <div class="seller-card-rank ${rankClass}">${rankLabel}</div>
+          </div>
+        </div>
+        <div class="seller-card-stats">
+          <div class="seller-stat"><span class="seller-stat-val">${Number(s.trades || 0).toLocaleString()}</span><span class="seller-stat-label">TRADES</span></div>
+          <div class="seller-stat"><span class="seller-stat-val">${escapeHtml(s.positive_pct || '100%')}</span><span class="seller-stat-label">POSITIVOS</span></div>
+          <div class="seller-stat"><span class="seller-stat-val">${escapeHtml(s.seniority || '—')}</span><span class="seller-stat-label">ANTIGÜEDAD</span></div>
+        </div>
+      `;
+      sellersGrid.appendChild(div);
+    }
+
+    async function loadSellers() {
+      sellersGrid.innerHTML = '<div class="sellers-loading">CARGANDO VENDEDORES...</div>';
+      const { data, error } = await db
+        .from('sellers')
+        .select('*')
+        .order('trades', { ascending: false })
+        .limit(30);
+
+      sellersGrid.innerHTML = '';
+
+      if (error || !data || data.length === 0) {
+        sellersGrid.innerHTML = '<div class="sellers-empty">✅ Aún no hay vendedores verificados registrados.</div>';
+        return;
+      }
+      data.forEach(s => renderSeller(s));
+    }
+
+    // Load sellers when view is opened
+    document.querySelectorAll('[data-nav="reliable"]').forEach(el => {
+      el.addEventListener('click', () => loadSellers(), { once: false });
+    });
+
+    loadSellers();
+
+  </script>
+</body>
+</html>
