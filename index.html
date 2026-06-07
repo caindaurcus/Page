@@ -4,26 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aurcus Hub | Caind</title>
+    
+    <!-- Estilos -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
+    
+    <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <!-- Overlay para cerrar menú -->
     <div class="overlay" id="overlay"></div>
+
+    <!-- Navegación Lateral -->
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header"><h2>AURCUS HUB</h2><button class="close-btn" id="close-btn">&times;</button></div>
-        <ul class="sidebar-menu" id="menu-items"></ul>
+        <div class="sidebar-header">
+            <h2>AURCUS HUB</h2>
+            <button class="close-btn" id="close-btn">&times;</button>
+        </div>
+        <ul class="sidebar-menu" id="menu-items">
+            <!-- Los items del menú se generan dinámicamente en app.js -->
+        </ul>
     </nav>
 
+    <!-- Barra Superior -->
     <header class="top-nav">
         <div class="menu-toggle" id="menu-btn"></div>
         <div class="brand">AURCUS <span class="brand-accent">WIKI</span></div>
+        <select id="lang" onchange="changeLanguage()">
+            <option value="es">ES</option>
+            <option value="en">EN</option>
+        </select>
     </header>
 
+    <!-- Noticia en tiempo real -->
+    <div class="news-ticker">
+        <span class="ticker-label">NEWS:</span>
+        <marquee>Bienvenido a Caind Hub v4.0 // Guías de Gate 4 disponibles // Mercado activo.</marquee>
+    </div>
+
+    <!-- Área de Contenido Principal -->
     <main class="container" id="content-area">
-        <!-- Aquí se inyecta el contenido mediante app.js -->
+        <!-- El contenido se inyecta mediante app.js -->
     </main>
 
+    <!-- Scripts -->
     <script src="data.js"></script>
     <script src="app.js"></script>
+    
 </body>
 </html>
