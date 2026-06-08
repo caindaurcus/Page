@@ -10,240 +10,230 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    #flash-overlay {
-      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-      background: radial-gradient(ellipse at center, rgba(201,168,76,0.95) 0%, rgba(0,229,255,0.7) 40%, rgba(5,10,15,0.98) 100%);
-      opacity: 0; transition: opacity 0.08s ease;
-    }
-    #flash-overlay.flash-in  { opacity: 1; }
-    #flash-overlay.flash-out { opacity: 0; transition: opacity 0.35s ease; }
-    #flash-overlay::after {
-      content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.4) 3px, rgba(0,0,0,0.4) 4px);
-    }
-    .view { display: none; opacity: 0; }
-    .view.active { display: block; animation: viewEnter 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-    @keyframes viewEnter {
-      from { opacity: 0; transform: translateY(18px) scale(0.98); filter: blur(4px); }
-      to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-    }
-    .drawer-item.nav-active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,168,76,0.06); }
-    .drawer-item.nav-active .d-arrow { color: var(--gold); }
+    /* ── FLASH & VIEWS ── */
+    #flash-overlay { position:fixed;inset:0;z-index:9999;pointer-events:none;background:radial-gradient(ellipse at center,rgba(201,168,76,0.95) 0%,rgba(0,229,255,0.7) 40%,rgba(5,10,15,0.98) 100%);opacity:0;transition:opacity 0.08s ease; }
+    #flash-overlay.flash-in{opacity:1;}
+    #flash-overlay.flash-out{opacity:0;transition:opacity 0.35s ease;}
+    #flash-overlay::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.4) 3px,rgba(0,0,0,0.4) 4px);}
+    .view{display:none;opacity:0;}
+    .view.active{display:block;animation:viewEnter 0.5s cubic-bezier(0.22,1,0.36,1) both;}
+    @keyframes viewEnter{from{opacity:0;transform:translateY(18px) scale(0.98);filter:blur(4px);}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}}
+    .drawer-item.nav-active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,0.06);}
+    .drawer-item.nav-active .d-arrow{color:var(--gold);}
 
-    .view-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid var(--border-g); }
-    .view-header-icon { font-size: 2rem; }
-    .view-header-title { font-family: var(--font-title); font-size: 1.4rem; color: var(--gold); letter-spacing: 2px; }
-    .view-header-sub { font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyan); opacity: 0.6; letter-spacing: 1px; }
+    /* ── SHARED ── */
+    .view-header{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid var(--border-g);}
+    .view-header-icon{font-size:2rem;}
+    .view-header-title{font-family:var(--font-title);font-size:1.4rem;color:var(--gold);letter-spacing:2px;}
+    .view-header-sub{font-family:var(--font-mono);font-size:0.75rem;color:var(--cyan);opacity:0.6;letter-spacing:1px;}
+    .feed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .feed-label{font-family:var(--font-mono);font-size:0.68rem;letter-spacing:4px;color:#4a6a80;text-transform:uppercase;}
+    .live-dot{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:0.65rem;color:var(--green);}
+    .live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s step-end infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .empty-state{text-align:center;padding:40px 20px;font-family:var(--font-mono);font-size:0.78rem;color:#3a5a70;letter-spacing:1px;}
+    .empty-icon{font-size:2rem;margin-bottom:10px;display:block;opacity:0.4;}
+    .loading-state{text-align:center;padding:30px;font-family:var(--font-mono);font-size:0.72rem;color:#3a5a70;letter-spacing:2px;animation:pulse 1.5s ease infinite;}
+    @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes fadeOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(30px);}}
 
-    /* PUBLISH FORM (shared) */
-    .pub-box {
-      background: var(--bg-card); border: 1px solid var(--border-g); border-radius: 12px;
-      padding: 18px; margin-bottom: 24px; position: relative; overflow: hidden;
-    }
-    .pub-box::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--gold), var(--cyan), var(--gold));
-    }
-    .pub-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 3px; color: var(--cyan); opacity: 0.6; text-transform: uppercase; margin-bottom: 12px; }
-    .pub-input {
-      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-      border-radius: var(--radius); color: #e8f4ff; font-family: var(--font-body);
-      font-size: 0.9rem; padding: 10px 14px; margin-bottom: 10px; outline: none; transition: var(--transition);
-    }
-    .pub-input:focus { border-color: var(--gold); }
-    .pub-input::placeholder { color: #3a5a70; }
-    .pub-select {
-      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-      border-radius: var(--radius); color: #e8f4ff; font-family: var(--font-mono);
-      font-size: 0.82rem; padding: 10px 14px; margin-bottom: 10px; outline: none;
-      transition: var(--transition); appearance: none; cursor: pointer;
-    }
-    .pub-select:focus { border-color: var(--gold); }
-    .pub-textarea {
-      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-      border-radius: var(--radius); color: #e8f4ff; font-family: var(--font-body);
-      font-size: 0.92rem; padding: 12px 14px; resize: none; min-height: 80px;
-      outline: none; transition: var(--transition); line-height: 1.5;
-    }
-    .pub-textarea:focus { border-color: var(--gold); }
-    .pub-textarea::placeholder { color: #3a5a70; }
-    .pub-footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 12px; }
-    .btn-publish {
-      padding: 10px 24px; background: linear-gradient(135deg, var(--gold), #a07830);
-      color: #050a0f; font-family: var(--font-body); font-weight: 700; font-size: 0.88rem;
-      letter-spacing: 1px; border: none; border-radius: var(--radius); cursor: pointer;
-      transition: var(--transition); box-shadow: 0 4px 16px rgba(201,168,76,0.3);
-    }
-    .btn-publish:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,168,76,0.4); }
-    .btn-publish:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .pub-status { font-family: var(--font-mono); font-size: 0.72rem; padding: 8px 14px; border-radius: var(--radius); margin-bottom: 16px; display: none; }
-    .pub-status.ok  { background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.3); color: var(--green); display: block; }
-    .pub-status.err { background: rgba(255,61,61,0.08);  border: 1px solid rgba(255,61,61,0.3);  color: var(--red);   display: block; }
+    /* ── EXPIRY BADGE ── */
+    .expiry-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:0.58rem;color:#ff9800;background:rgba(255,152,0,0.08);border:1px solid rgba(255,152,0,0.2);border-radius:4px;padding:2px 6px;margin-left:6px;}
+    .expiry-badge.urgent{color:var(--red);background:rgba(255,61,61,0.08);border-color:rgba(255,61,61,0.2);}
 
-    .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .feed-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 4px; color: #4a6a80; text-transform: uppercase; }
-    .live-dot { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.65rem; color: var(--green); }
-    .live-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 1.5s step-end infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    /* ── PUBLISH FORM ── */
+    .pub-box{background:linear-gradient(135deg,rgba(10,21,32,0.98),rgba(5,10,15,0.95));border:1px solid var(--border-g);border-radius:14px;padding:20px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+    .pub-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--cyan),var(--gold),transparent);}
+    .pub-box::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top,rgba(201,168,76,0.04) 0%,transparent 70%);pointer-events:none;}
+    .pub-label{font-family:var(--font-mono);font-size:0.68rem;letter-spacing:3px;color:var(--cyan);opacity:0.7;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .pub-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border-g),transparent);}
+    .pub-input{width:100%;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:#e8f4ff;font-family:var(--font-body);font-size:0.9rem;padding:11px 14px;margin-bottom:10px;outline:none;transition:all 0.2s;}
+    .pub-input:focus{border-color:var(--gold);background:rgba(0,0,0,0.5);box-shadow:0 0 0 3px rgba(201,168,76,0.08);}
+    .pub-input::placeholder{color:#2a4a60;}
+    .pub-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+    .pub-row .pub-input,.pub-row .pub-select{margin-bottom:0;}
+    .pub-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+    .pub-row3 .pub-input,.pub-row3 .pub-select{margin-bottom:0;}
+    .pub-select{width:100%;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:#e8f4ff;font-family:var(--font-mono);font-size:0.82rem;padding:11px 14px;outline:none;transition:all 0.2s;appearance:none;cursor:pointer;}
+    .pub-select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.08);}
+    .pub-textarea{width:100%;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:#e8f4ff;font-family:var(--font-body);font-size:0.9rem;padding:11px 14px;resize:none;min-height:75px;outline:none;transition:all 0.2s;line-height:1.5;margin-bottom:10px;}
+    .pub-textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.08);}
+    .pub-textarea::placeholder{color:#2a4a60;}
+    .pub-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px;}
+    .pub-expiry-note{font-family:var(--font-mono);font-size:0.62rem;color:#3a5a70;}
+    .btn-publish{padding:11px 26px;background:linear-gradient(135deg,#c9a84c,#8a5820);color:#050a0f;font-family:var(--font-body);font-weight:700;font-size:0.88rem;letter-spacing:1.5px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(201,168,76,0.25),inset 0 1px 0 rgba(255,255,255,0.15);}
+    .btn-publish:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,168,76,0.4);}
+    .btn-publish:active{transform:translateY(0);}
+    .btn-publish:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+    .pub-status{font-family:var(--font-mono);font-size:0.72rem;padding:10px 16px;border-radius:8px;margin-bottom:16px;display:none;}
+    .pub-status.ok{background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.3);color:var(--green);display:block;}
+    .pub-status.err{background:rgba(255,61,61,0.08);border:1px solid rgba(255,61,61,0.3);color:var(--red);display:block;}
 
-    /* MARKET */
-    .market-view { padding: 28px 0 60px; }
-    .market-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .filter-btn { padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; background: transparent; color: #7a9ab8; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 1px; cursor: pointer; transition: var(--transition); }
-    .filter-btn:hover, .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.07); }
-    .market-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 20px; }
-    .market-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; transition: var(--transition); position: relative; overflow: hidden; }
-    .market-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity 0.3s; }
-    .market-item:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: var(--shadow-g); }
-    .market-item:hover::before { opacity: 1; }
-    .item-rarity { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-    .rarity-legendary { color: #f0a030; }
-    .rarity-epic      { color: #a060ff; }
-    .rarity-rare      { color: var(--cyan); }
-    .rarity-common    { color: #7a9ab8; }
-    .item-name { font-family: var(--font-body); font-weight: 700; font-size: 0.95rem; color: #e8f4ff; margin-bottom: 4px; }
-    .item-seller { font-family: var(--font-mono); font-size: 0.7rem; color: #5a7a90; margin-bottom: 6px; }
-    .item-desc { font-size: 0.78rem; color: #4a6a80; margin-bottom: 10px; line-height: 1.4; }
-    .item-price { font-family: var(--font-title); font-size: 1rem; color: var(--gold); }
-    .item-price-unit { font-family: var(--font-mono); font-size: 0.65rem; color: #5a7a90; margin-left: 4px; }
-    .empty-state { text-align: center; padding: 40px 20px; font-family: var(--font-mono); font-size: 0.78rem; color: #3a5a70; letter-spacing: 1px; }
-    .empty-icon { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.4; }
-    .loading-state { text-align: center; padding: 30px; font-family: var(--font-mono); font-size: 0.72rem; color: #3a5a70; letter-spacing: 2px; animation: pulse 1.5s ease infinite; }
-    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+    /* ── MARKET ── */
+    .market-view{padding:28px 0 60px;}
+    .market-list{display:flex;flex-direction:column;gap:6px;}
+    .market-row{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(10,21,32,0.95),rgba(5,14,22,0.9));border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:11px 14px;transition:all 0.2s;cursor:pointer;position:relative;overflow:hidden;animation:slideIn 0.35s ease both;}
+    .market-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+    .market-row::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.02),transparent);pointer-events:none;}
+    .market-row.star-1::before{background:#7a9ab8;}
+    .market-row.star-2::before{background:#4aafff;}
+    .market-row.star-3::before{background:#00e5ff;}
+    .market-row.star-4::before{background:#00e676;}
+    .market-row.star-5::before{background:#c9a84c;}
+    .market-row.star-6::before{background:#ff9800;}
+    .market-row.star-7::before{background:#a060ff;}
+    .market-row.star-8::before{background:linear-gradient(180deg,#ff3d3d,#ff9800,#ffd700);}
+    .market-row:hover{border-color:rgba(201,168,76,0.2);transform:translateX(3px);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+    .market-row-badge{display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);border-radius:8px;padding:7px 4px;border:1px solid rgba(255,255,255,0.06);min-width:48px;}
+    .market-row-star{font-family:var(--font-mono);font-size:0.75rem;font-weight:700;line-height:1;}
+    .star-1 .market-row-star{color:#7a9ab8;}
+    .star-2 .market-row-star{color:#4aafff;}
+    .star-3 .market-row-star{color:#00e5ff;}
+    .star-4 .market-row-star{color:#00e676;}
+    .star-5 .market-row-star{color:#c9a84c;}
+    .star-6 .market-row-star{color:#ff9800;}
+    .star-7 .market-row-star{color:#a060ff;}
+    .star-8 .market-row-star{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.5);}
+    .market-row-lv{font-family:var(--font-mono);font-size:0.6rem;color:#4a6a80;margin-top:3px;}
+    .market-row-qty{font-family:var(--font-mono);font-size:0.58rem;color:#3a5a70;margin-top:1px;}
+    .market-row-info{min-width:0;}
+    .market-row-name{font-family:var(--font-body);font-weight:700;font-size:0.92rem;color:#e8f4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+    .market-row-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px;}
+    .market-row-seller{font-family:var(--font-mono);font-size:0.63rem;color:#4a6a80;}
+    .market-row-desc{font-size:0.74rem;color:#3a5a70;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .market-row-price{text-align:right;white-space:nowrap;}
+    .market-row-price-val{font-family:var(--font-title);font-size:0.9rem;color:var(--gold);display:block;text-shadow:0 0 8px rgba(201,168,76,0.3);}
+    .market-row-price-unit{font-family:var(--font-mono);font-size:0.58rem;color:#4a6a80;}
 
-    /* SELLERS */
-    .reliable-view { padding: 28px 0 60px; }
-    .verified-badge-big { display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: rgba(0,230,118,0.06); border: 1px solid rgba(0,230,118,0.2); border-radius: var(--radius); margin-bottom: 22px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--green); letter-spacing: 1px; }
-    .sellers-list { display: flex; flex-direction: column; gap: 10px; }
-    .seller-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; transition: var(--transition); animation: slideIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
-    .seller-card:hover { border-color: var(--border-g); }
-    @keyframes slideIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
-    .seller-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .seller-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-mid); border: 2px solid var(--border-g); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-    .seller-card-name { font-weight: 700; color: #d0e4f4; font-size: 0.95rem; }
-    .seller-card-trades { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); }
-    .seller-card-rating { font-family: var(--font-mono); font-size: 0.65rem; color: var(--green); }
-    .seller-card-desc { font-size: 0.82rem; color: #5a7a90; line-height: 1.4; }
+    /* ── SELLERS ── */
+    .reliable-view{padding:28px 0 60px;}
+    .verified-badge-big{display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);border-radius:var(--radius);margin-bottom:22px;font-family:var(--font-mono);font-size:0.75rem;color:var(--green);letter-spacing:1px;}
+    .sellers-list{display:flex;flex-direction:column;gap:10px;}
+    .seller-card{background:linear-gradient(135deg,rgba(10,21,32,0.95),rgba(5,14,22,0.9));border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:16px 18px;transition:all 0.2s;animation:slideIn 0.35s ease both;position:relative;overflow:hidden;}
+    .seller-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,230,118,0.3),transparent);}
+    .seller-card:hover{border-color:rgba(0,230,118,0.15);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+    .seller-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+    .seller-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,rgba(10,21,32,0.9),rgba(5,14,22,0.9));border:2px solid var(--border-g);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 0 12px rgba(201,168,76,0.1);}
+    .seller-card-name{font-weight:700;color:#d0e4f4;font-size:0.95rem;}
+    .seller-card-stats{display:flex;gap:10px;margin-top:2px;}
+    .seller-stat-pill{font-family:var(--font-mono);font-size:0.63rem;padding:2px 8px;border-radius:20px;}
+    .seller-stat-pill.trades{color:var(--gold);background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);}
+    .seller-stat-pill.rating{color:var(--green);background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);}
+    .seller-card-desc{font-size:0.82rem;color:#5a7a90;line-height:1.45;}
 
-    /* FORO */
-    .foro-view { padding: 28px 0 60px; }
-    .foro-feed { display: flex; flex-direction: column; gap: 10px; }
-    .post-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; transition: var(--transition); animation: slideIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
-    .post-card:hover { border-color: var(--border-g); }
-    .post-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .post-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--bg-mid); border: 1px solid var(--border-g); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-    .post-nick { font-family: var(--font-body); font-weight: 700; font-size: 0.9rem; color: var(--gold); }
-    .post-time { font-family: var(--font-mono); font-size: 0.62rem; color: #3a5a70; margin-left: auto; }
-    .post-content { font-size: 0.9rem; color: #b0c8d8; line-height: 1.55; word-break: break-word; }
-    .char-count { font-family: var(--font-mono); font-size: 0.65rem; color: #3a5a70; }
+    /* ── FORO ── */
+    .foro-view{padding:28px 0 60px;}
+    .foro-feed{display:flex;flex-direction:column;gap:8px;}
+    .post-card{background:linear-gradient(135deg,rgba(10,21,32,0.95),rgba(5,14,22,0.9));border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:16px 18px;transition:all 0.2s;animation:slideIn 0.35s ease both;position:relative;overflow:hidden;}
+    .post-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,0.2),transparent);}
+    .post-card:hover{border-color:rgba(0,229,255,0.12);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.3);}
+    .post-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .post-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(10,21,32,0.9),rgba(5,14,22,0.9));border:1px solid var(--border-g);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+    .post-nick{font-family:var(--font-body);font-weight:700;font-size:0.9rem;color:var(--gold);}
+    .post-time{font-family:var(--font-mono);font-size:0.62rem;color:#3a5a70;margin-left:auto;}
+    .post-content{font-size:0.9rem;color:#b0c8d8;line-height:1.6;word-break:break-word;}
+    .char-count{font-family:var(--font-mono);font-size:0.65rem;color:#3a5a70;}
 
-    /* BUILDS */
-    .builds-view { padding: 28px 0 60px; }
-    .class-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
-    .class-tab { padding: 7px 16px; border: 1px solid var(--border); border-radius: var(--radius); background: transparent; color: #7a9ab8; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 1px; cursor: pointer; transition: var(--transition); }
-    .class-tab:hover { border-color: var(--cyan); color: var(--cyan); }
-    .class-tab.active { border-color: var(--cyan); color: #050a0f; background: var(--cyan); }
-    .builds-grid { display: flex; flex-direction: column; gap: 12px; }
-    .build-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; transition: var(--transition); cursor: pointer; }
-    .build-card:hover { border-color: var(--cyan); background: rgba(0,229,255,0.03); }
-    .build-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
-    .build-name { font-family: var(--font-body); font-weight: 700; font-size: 1rem; color: #e8f4ff; }
-    .build-class { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); color: var(--cyan); }
-    .build-desc { font-size: 0.82rem; color: #5a7a90; line-height: 1.45; margin-bottom: 12px; }
-    .build-meta { display: flex; gap: 16px; align-items: center; }
-    .build-author { font-family: var(--font-mono); font-size: 0.7rem; color: #4a6a80; }
-    .build-author span { color: var(--gold); }
-    .build-diff { display: flex; gap: 3px; }
-    .diff-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
-    .diff-dot.filled { background: var(--cyan); }
-    .build-views { margin-left: auto; font-family: var(--font-mono); font-size: 0.68rem; color: #3a5a70; }
+    /* ── OTHER VIEWS ── */
+    .builds-view{padding:28px 0 60px;}
+    .class-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;}
+    .class-tab{padding:7px 16px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:#7a9ab8;font-family:var(--font-mono);font-size:0.72rem;letter-spacing:1px;cursor:pointer;transition:var(--transition);}
+    .class-tab:hover{border-color:var(--cyan);color:var(--cyan);}
+    .class-tab.active{border-color:var(--cyan);color:#050a0f;background:var(--cyan);}
+    .builds-grid{display:flex;flex-direction:column;gap:12px;}
+    .build-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;transition:var(--transition);cursor:pointer;}
+    .build-card:hover{border-color:var(--cyan);background:rgba(0,229,255,0.03);}
+    .build-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+    .build-name{font-family:var(--font-body);font-weight:700;font-size:1rem;color:#e8f4ff;}
+    .build-class{font-family:var(--font-mono);font-size:0.68rem;letter-spacing:1px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);color:var(--cyan);}
+    .build-desc{font-size:0.82rem;color:#5a7a90;line-height:1.45;margin-bottom:12px;}
+    .build-meta{display:flex;gap:16px;align-items:center;}
+    .build-author{font-family:var(--font-mono);font-size:0.7rem;color:#4a6a80;}
+    .build-author span{color:var(--gold);}
+    .build-diff{display:flex;gap:3px;}
+    .diff-dot{width:7px;height:7px;border-radius:50%;background:var(--border);}
+    .diff-dot.filled{background:var(--cyan);}
+    .build-views{margin-left:auto;font-family:var(--font-mono);font-size:0.68rem;color:#3a5a70;}
+    .rankings-view{padding:28px 0 60px;}
+    .season-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(201,168,76,0.08);border:1px solid var(--border-g);border-radius:20px;font-family:var(--font-mono);font-size:0.72rem;color:var(--gold);letter-spacing:2px;margin-bottom:24px;}
+    .season-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.5s step-end infinite;}
+    .rank-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;align-items:end;}
+    .podium-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 12px;text-align:center;transition:var(--transition);position:relative;overflow:hidden;}
+    .podium-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+    .podium-1{border-color:rgba(255,215,0,0.4);}.podium-1::after{background:linear-gradient(90deg,transparent,#ffd700,transparent);}
+    .podium-2{border-color:rgba(192,192,192,0.3);}.podium-2::after{background:linear-gradient(90deg,transparent,#c0c0c0,transparent);}
+    .podium-3{border-color:rgba(205,127,50,0.3);}.podium-3::after{background:linear-gradient(90deg,transparent,#cd7f32,transparent);}
+    .podium-medal{font-size:1.6rem;display:block;margin-bottom:6px;}
+    .podium-name{font-family:var(--font-body);font-weight:700;font-size:0.85rem;color:#e8f4ff;margin-bottom:2px;}
+    .podium-class{font-family:var(--font-mono);font-size:0.65rem;color:#4a6a80;margin-bottom:8px;}
+    .podium-score{font-family:var(--font-title);font-size:0.9rem;color:var(--gold);}
+    .rank-rest{display:flex;flex-direction:column;gap:6px;}
+    .rank-entry{display:grid;grid-template-columns:40px 1fr auto auto;gap:10px;align-items:center;padding:11px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);font-size:0.85rem;transition:var(--transition);}
+    .rank-entry:hover{border-color:var(--border-g);background:rgba(201,168,76,0.03);}
+    .rank-pos{font-family:var(--font-mono);font-size:0.8rem;color:#4a6a80;text-align:center;}
+    .rank-player{font-weight:600;color:#c8d8e8;}
+    .rank-class-badge{font-family:var(--font-mono);font-size:0.65rem;color:#4a6a80;padding:2px 6px;border:1px solid var(--border);border-radius:4px;}
+    .rank-score-val{font-family:var(--font-mono);font-size:0.78rem;color:var(--gold);}
+    .events-view{padding:28px 0 60px;}
+    .active-event-banner{background:linear-gradient(135deg,rgba(0,230,118,0.08) 0%,rgba(0,229,255,0.05) 100%);border:1px solid rgba(0,230,118,0.3);border-radius:12px;padding:22px 20px;margin-bottom:20px;position:relative;overflow:hidden;}
+    .active-event-banner::before{content:'LIVE';position:absolute;top:14px;right:16px;font-family:var(--font-mono);font-size:0.62rem;letter-spacing:3px;color:var(--green);background:rgba(0,230,118,0.12);padding:3px 8px;border-radius:4px;border:1px solid rgba(0,230,118,0.3);animation:blink 2s step-end infinite;}
+    .active-event-name{font-family:var(--font-title);font-size:1.05rem;color:var(--green);letter-spacing:1px;margin-bottom:6px;}
+    .active-event-desc{font-size:0.82rem;color:#5a7a90;margin-bottom:14px;line-height:1.5;}
+    .countdown-block{display:flex;gap:12px;align-items:center;}
+    .countdown-label{font-family:var(--font-mono);font-size:0.68rem;color:#4a6a80;letter-spacing:2px;}
+    .countdown-timer{font-family:var(--font-title);font-size:1.3rem;color:var(--gold);text-shadow:0 0 12px rgba(201,168,76,0.4);}
+    .upcoming-label{font-family:var(--font-mono);font-size:0.68rem;letter-spacing:4px;color:#4a6a80;text-transform:uppercase;margin:22px 0 12px;}
+    .upcoming-list{display:flex;flex-direction:column;gap:10px;}
+    .upcoming-card{display:flex;gap:16px;align-items:flex-start;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;transition:var(--transition);}
+    .upcoming-card:hover{border-color:var(--cyan);}
+    .upcoming-date{font-family:var(--font-mono);font-size:0.68rem;color:var(--cyan);opacity:0.7;white-space:nowrap;margin-top:2px;}
+    .upcoming-name{font-weight:600;font-size:0.9rem;color:#d0e4f4;margin-bottom:3px;}
+    .upcoming-desc{font-size:0.78rem;color:#5a7a90;line-height:1.4;}
+    .news-view{padding:28px 0 60px;}
+    .patch-tag{display:inline-block;font-family:var(--font-mono);font-size:0.6rem;letter-spacing:3px;padding:3px 8px;border-radius:4px;margin-bottom:6px;text-transform:uppercase;}
+    .tag-patch{background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+    .tag-hotfix{background:rgba(255,61,61,0.1);color:var(--red);border:1px solid rgba(255,61,61,0.3);}
+    .tag-news{background:rgba(0,229,255,0.08);color:var(--cyan);border:1px solid var(--border);}
+    .tag-event{background:rgba(0,230,118,0.08);color:var(--green);border:1px solid rgba(0,230,118,0.3);}
+    .news-featured{background:var(--bg-card);border:1px solid var(--border-g);border-radius:12px;padding:24px 20px;margin-bottom:16px;position:relative;overflow:hidden;}
+    .news-featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--cyan),var(--gold));}
+    .news-featured-title{font-family:var(--font-title);font-size:1rem;color:#e8f4ff;margin-bottom:8px;letter-spacing:1px;line-height:1.3;}
+    .news-featured-body{font-size:0.82rem;color:#5a7a90;line-height:1.6;margin-bottom:14px;}
+    .news-meta{display:flex;gap:14px;align-items:center;}
+    .news-date{font-family:var(--font-mono);font-size:0.68rem;color:#3a5a70;}
+    .news-read-more{font-family:var(--font-mono);font-size:0.7rem;color:var(--cyan);text-decoration:none;letter-spacing:1px;opacity:0.7;transition:opacity 0.2s;}
+    .news-read-more:hover{opacity:1;}
+    .news-list{display:flex;flex-direction:column;gap:10px;}
+    .news-row{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;transition:var(--transition);cursor:pointer;}
+    .news-row:hover{border-color:var(--border-g);transform:translateX(3px);}
+    .news-row-title{font-weight:600;font-size:0.88rem;color:#c8d8e8;margin-bottom:4px;}
+    .news-row-date{font-family:var(--font-mono);font-size:0.65rem;color:#3a5a70;}
+    .community-view{padding:28px 0 60px;}
+    .discord-banner{background:linear-gradient(135deg,rgba(88,101,242,0.15) 0%,rgba(0,229,255,0.05) 100%);border:1px solid rgba(88,101,242,0.35);border-radius:14px;padding:28px 22px;margin-bottom:20px;text-align:center;}
+    .discord-icon{font-size:2.5rem;margin-bottom:10px;display:block;}
+    .discord-title{font-family:var(--font-title);font-size:1.05rem;color:#e8f4ff;letter-spacing:2px;margin-bottom:8px;}
+    .discord-desc{font-size:0.82rem;color:#5a7a90;margin-bottom:18px;line-height:1.5;}
+    .btn-discord{display:inline-block;padding:12px 28px;background:#5865f2;color:#fff;font-family:var(--font-body);font-weight:700;font-size:0.88rem;letter-spacing:1px;text-decoration:none;border-radius:var(--radius);transition:var(--transition);box-shadow:0 4px 20px rgba(88,101,242,0.4);}
+    .btn-discord:hover{background:#4752c4;transform:translateY(-2px);}
+    .social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px;}
+    .social-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;transition:var(--transition);}
+    .social-card:hover{border-color:var(--cyan);transform:translateY(-2px);}
+    .social-icon{font-size:1.4rem;}
+    .social-name{font-weight:600;font-size:0.88rem;color:#c8d8e8;}
+    .social-handle{font-family:var(--font-mono);font-size:0.68rem;color:#4a6a80;}
+    .rules-block{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px;}
+    .rules-title{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:4px;color:var(--cyan);opacity:0.6;text-transform:uppercase;margin-bottom:14px;}
+    .rule-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:#7a9ab8;line-height:1.4;}
+    .rule-item:last-child{border-bottom:none;}
+    .rule-num{font-family:var(--font-mono);font-size:0.7rem;color:var(--gold);opacity:0.6;flex-shrink:0;margin-top:1px;}
 
-    /* RANKINGS */
-    .rankings-view { padding: 28px 0 60px; }
-    .season-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(201,168,76,0.08); border: 1px solid var(--border-g); border-radius: 20px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold); letter-spacing: 2px; margin-bottom: 24px; }
-    .season-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: blink 1.5s step-end infinite; }
-    .rank-podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; align-items: end; }
-    .podium-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 12px; text-align: center; transition: var(--transition); position: relative; overflow: hidden; }
-    .podium-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
-    .podium-1 { border-color: rgba(255,215,0,0.4); } .podium-1::after { background: linear-gradient(90deg, transparent, #ffd700, transparent); }
-    .podium-2 { border-color: rgba(192,192,192,0.3); } .podium-2::after { background: linear-gradient(90deg, transparent, #c0c0c0, transparent); }
-    .podium-3 { border-color: rgba(205,127,50,0.3); }  .podium-3::after { background: linear-gradient(90deg, transparent, #cd7f32, transparent); }
-    .podium-medal { font-size: 1.6rem; display: block; margin-bottom: 6px; }
-    .podium-name { font-family: var(--font-body); font-weight: 700; font-size: 0.85rem; color: #e8f4ff; margin-bottom: 2px; }
-    .podium-class { font-family: var(--font-mono); font-size: 0.65rem; color: #4a6a80; margin-bottom: 8px; }
-    .podium-score { font-family: var(--font-title); font-size: 0.9rem; color: var(--gold); }
-    .rank-rest { display: flex; flex-direction: column; gap: 6px; }
-    .rank-entry { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 10px; align-items: center; padding: 11px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; transition: var(--transition); }
-    .rank-entry:hover { border-color: var(--border-g); background: rgba(201,168,76,0.03); }
-    .rank-pos { font-family: var(--font-mono); font-size: 0.8rem; color: #4a6a80; text-align: center; }
-    .rank-player { font-weight: 600; color: #c8d8e8; }
-    .rank-class-badge { font-family: var(--font-mono); font-size: 0.65rem; color: #4a6a80; padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; }
-    .rank-score-val { font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold); }
-
-    /* EVENTS */
-    .events-view { padding: 28px 0 60px; }
-    .active-event-banner { background: linear-gradient(135deg, rgba(0,230,118,0.08) 0%, rgba(0,229,255,0.05) 100%); border: 1px solid rgba(0,230,118,0.3); border-radius: 12px; padding: 22px 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
-    .active-event-banner::before { content: 'LIVE'; position: absolute; top: 14px; right: 16px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 3px; color: var(--green); background: rgba(0,230,118,0.12); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(0,230,118,0.3); animation: blink 2s step-end infinite; }
-    .active-event-name { font-family: var(--font-title); font-size: 1.05rem; color: var(--green); letter-spacing: 1px; margin-bottom: 6px; }
-    .active-event-desc { font-size: 0.82rem; color: #5a7a90; margin-bottom: 14px; line-height: 1.5; }
-    .countdown-block { display: flex; gap: 12px; align-items: center; }
-    .countdown-label { font-family: var(--font-mono); font-size: 0.68rem; color: #4a6a80; letter-spacing: 2px; }
-    .countdown-timer { font-family: var(--font-title); font-size: 1.3rem; color: var(--gold); text-shadow: 0 0 12px rgba(201,168,76,0.4); }
-    .upcoming-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 4px; color: #4a6a80; text-transform: uppercase; margin: 22px 0 12px; }
-    .upcoming-list { display: flex; flex-direction: column; gap: 10px; }
-    .upcoming-card { display: flex; gap: 16px; align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; transition: var(--transition); }
-    .upcoming-card:hover { border-color: var(--cyan); }
-    .upcoming-date { font-family: var(--font-mono); font-size: 0.68rem; color: var(--cyan); opacity: 0.7; white-space: nowrap; margin-top: 2px; }
-    .upcoming-name { font-weight: 600; font-size: 0.9rem; color: #d0e4f4; margin-bottom: 3px; }
-    .upcoming-desc { font-size: 0.78rem; color: #5a7a90; line-height: 1.4; }
-
-    /* NEWS */
-    .news-view { padding: 28px 0 60px; }
-    .patch-tag { display: inline-block; font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 3px; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; text-transform: uppercase; }
-    .tag-patch  { background: rgba(201,168,76,0.1);  color: var(--gold);  border: 1px solid rgba(201,168,76,0.3); }
-    .tag-hotfix { background: rgba(255,61,61,0.1);   color: var(--red);   border: 1px solid rgba(255,61,61,0.3); }
-    .tag-news   { background: rgba(0,229,255,0.08);  color: var(--cyan);  border: 1px solid var(--border); }
-    .tag-event  { background: rgba(0,230,118,0.08);  color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
-    .news-featured { background: var(--bg-card); border: 1px solid var(--border-g); border-radius: 12px; padding: 24px 20px; margin-bottom: 16px; position: relative; overflow: hidden; }
-    .news-featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold), var(--cyan), var(--gold)); }
-    .news-featured-title { font-family: var(--font-title); font-size: 1rem; color: #e8f4ff; margin-bottom: 8px; letter-spacing: 1px; line-height: 1.3; }
-    .news-featured-body { font-size: 0.82rem; color: #5a7a90; line-height: 1.6; margin-bottom: 14px; }
-    .news-meta { display: flex; gap: 14px; align-items: center; }
-    .news-date { font-family: var(--font-mono); font-size: 0.68rem; color: #3a5a70; }
-    .news-read-more { font-family: var(--font-mono); font-size: 0.7rem; color: var(--cyan); text-decoration: none; letter-spacing: 1px; opacity: 0.7; transition: opacity 0.2s; }
-    .news-read-more:hover { opacity: 1; }
-    .news-list { display: flex; flex-direction: column; gap: 10px; }
-    .news-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; transition: var(--transition); cursor: pointer; }
-    .news-row:hover { border-color: var(--border-g); transform: translateX(3px); }
-    .news-row-title { font-weight: 600; font-size: 0.88rem; color: #c8d8e8; margin-bottom: 4px; }
-    .news-row-date { font-family: var(--font-mono); font-size: 0.65rem; color: #3a5a70; }
-
-    /* COMMUNITY */
-    .community-view { padding: 28px 0 60px; }
-    .discord-banner { background: linear-gradient(135deg, rgba(88,101,242,0.15) 0%, rgba(0,229,255,0.05) 100%); border: 1px solid rgba(88,101,242,0.35); border-radius: 14px; padding: 28px 22px; margin-bottom: 20px; text-align: center; }
-    .discord-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-    .discord-title { font-family: var(--font-title); font-size: 1.05rem; color: #e8f4ff; letter-spacing: 2px; margin-bottom: 8px; }
-    .discord-desc { font-size: 0.82rem; color: #5a7a90; margin-bottom: 18px; line-height: 1.5; }
-    .btn-discord { display: inline-block; padding: 12px 28px; background: #5865f2; color: #fff; font-family: var(--font-body); font-weight: 700; font-size: 0.88rem; letter-spacing: 1px; text-decoration: none; border-radius: var(--radius); transition: var(--transition); box-shadow: 0 4px 20px rgba(88,101,242,0.4); }
-    .btn-discord:hover { background: #4752c4; transform: translateY(-2px); }
-    .social-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 22px; }
-    .social-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; transition: var(--transition); }
-    .social-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
-    .social-icon { font-size: 1.4rem; }
-    .social-name { font-weight: 600; font-size: 0.88rem; color: #c8d8e8; }
-    .social-handle { font-family: var(--font-mono); font-size: 0.68rem; color: #4a6a80; }
-    .rules-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
-    .rules-title { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 4px; color: var(--cyan); opacity: 0.6; text-transform: uppercase; margin-bottom: 14px; }
-    .rule-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; color: #7a9ab8; line-height: 1.4; }
-    .rule-item:last-child { border-bottom: none; }
-    .rule-num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); opacity: 0.6; flex-shrink: 0; margin-top: 1px; }
-
-    @media (max-width: 480px) {
-      .market-grid { grid-template-columns: 1fr; }
-      .rank-podium { grid-template-columns: 1fr; }
-      .social-grid { grid-template-columns: 1fr; }
-      .rank-entry  { grid-template-columns: 36px 1fr auto; }
-      .rank-class-badge { display: none; }
+    @media(max-width:480px){
+      .rank-podium{grid-template-columns:1fr;}
+      .social-grid{grid-template-columns:1fr;}
+      .rank-entry{grid-template-columns:36px 1fr auto;}
+      .rank-class-badge{display:none;}
+      .pub-row3{grid-template-columns:1fr 1fr;}
     }
   </style>
 </head>
@@ -261,10 +251,7 @@
 
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <aside class="drawer" id="drawer">
-    <div class="drawer-header">
-      <span class="drawer-title">⚔ AURCUS MENU</span>
-      <button class="drawer-close" id="drawerClose">✕</button>
-    </div>
+    <div class="drawer-header"><span class="drawer-title">⚔ AURCUS MENU</span><button class="drawer-close" id="drawerClose">✕</button></div>
     <nav class="drawer-nav">
       <a href="#" class="drawer-item" data-nav="news"><span class="d-icon">📰</span><div class="d-info"><span class="d-title">Noticias & Parches</span><span class="d-desc">Updates del servidor</span></div><span class="d-arrow">›</span></a>
       <a href="#" class="drawer-item" data-nav="market"><span class="d-icon">💰</span><div class="d-info"><span class="d-title">Market</span><span class="d-desc">Compra & vende items</span></div><span class="d-arrow">›</span></a>
@@ -301,15 +288,12 @@
       <div class="hero-deco"><div class="deco-ring ring1"></div><div class="deco-ring ring2"></div><div class="deco-ring ring3"></div></div>
     </header>
     <div class="main-content">
-      <div class="alert-banner">
-        <span class="alert-icon">⚡</span>
-        <span class="alert-text">EVENTO ACTIVO: Double Drop Weekend — Termina en <span id="countdown">23:59:59</span></span>
-      </div>
+      <div class="alert-banner"><span class="alert-icon">⚡</span><span class="alert-text">EVENTO ACTIVO: Double Drop Weekend — Termina en <span id="countdown">23:59:59</span></span></div>
       <section class="cards-section">
         <div class="section-label">Acceso Rápido</div>
         <div class="cards-grid">
-          <a href="#" class="card" data-nav="market"><div class="card-bg card-bg--market"></div><div class="card-icon">💰</div><h3 class="card-title">Market</h3><p class="card-desc">Comprá y vendé items, equipo y drops raros con la comunidad.</p><span class="card-link">Explorar →</span></a>
-          <a href="#" class="card" data-nav="builds"><div class="card-bg card-bg--build"></div><div class="card-icon">🛡</div><h3 class="card-title">Builds</h3><p class="card-desc">Las mejores builds por clase compartidas por top players.</p><span class="card-link">Ver Builds →</span></a>
+          <a href="#" class="card" data-nav="market"><div class="card-bg card-bg--market"></div><div class="card-icon">💰</div><h3 class="card-title">Market</h3><p class="card-desc">Comprá y vendé items con la comunidad.</p><span class="card-link">Explorar →</span></a>
+          <a href="#" class="card" data-nav="builds"><div class="card-bg card-bg--build"></div><div class="card-icon">🛡</div><h3 class="card-title">Builds</h3><p class="card-desc">Las mejores builds por clase.</p><span class="card-link">Ver Builds →</span></a>
           <a href="#" class="card" data-nav="reliable"><div class="card-bg card-bg--reliable"></div><div class="card-icon">✅</div><h3 class="card-title">Vendedores</h3><p class="card-desc">Vendedores verificados por la comunidad.</p><span class="card-link">Ver →</span></a>
           <a href="#" class="card" data-nav="foro"><div class="card-bg card-bg--seller"></div><div class="card-icon">💬</div><h3 class="card-title">Foro</h3><p class="card-desc">Publicaciones de la comunidad en tiempo real.</p><span class="card-link">Ver Foro →</span></a>
         </div>
@@ -320,35 +304,31 @@
   <!-- MARKET -->
   <div class="view" id="view-market">
     <div class="main-content market-view">
-      <div class="view-header">
-        <span class="view-header-icon">💰</span>
-        <div><div class="view-header-title">Market</div><div class="view-header-sub">Items listados por la comunidad · En tiempo real</div></div>
-      </div>
-
+      <div class="view-header"><span class="view-header-icon">💰</span><div><div class="view-header-title">Market</div><div class="view-header-sub">Items listados · Se borran solos a las 24hs</div></div></div>
       <div class="pub-box">
         <div class="pub-label">Publicar item</div>
-        <input class="pub-input" id="mNick" type="text" placeholder="Tu nickname..." maxlength="30" />
-        <input class="pub-input" id="mName" type="text" placeholder="Nombre del item..." maxlength="60" />
-        <select class="pub-select" id="mRarity">
-          <option value="" disabled selected>Seleccioná la rareza...</option>
-          <option value="legendary">★ Legendario</option>
-          <option value="epic">◆ Épico</option>
-          <option value="rare">● Raro</option>
-          <option value="common">○ Común</option>
-        </select>
-        <input class="pub-input" id="mPrice" type="text" placeholder="Precio en gold..." maxlength="20" />
-        <textarea class="pub-textarea" id="mDesc" placeholder="Descripción del item..." maxlength="200"></textarea>
-        <div class="pub-footer"><button class="btn-publish" id="mPublishBtn">Publicar Item</button></div>
+        <input class="pub-input" id="mNick" type="text" placeholder="Tu nickname..." maxlength="30"/>
+        <input class="pub-input" id="mName" type="text" placeholder="Nombre del item..." maxlength="60"/>
+        <div class="pub-row3">
+          <select class="pub-select" id="mRarity">
+            <option value="" disabled selected>★ Rango</option>
+            <option value="1">★1</option><option value="2">★2</option><option value="3">★3</option>
+            <option value="4">★4</option><option value="5">★5</option><option value="6">★6</option>
+            <option value="7">★7</option><option value="8">★8</option>
+          </select>
+          <input class="pub-input" id="mLevel" type="number" placeholder="Lv (1-115)" min="1" max="115"/>
+          <input class="pub-input" id="mQty" type="number" placeholder="Cant." min="1" max="9999"/>
+        </div>
+        <input class="pub-input" id="mPrice" type="text" placeholder="Precio en gold..." maxlength="20"/>
+        <textarea class="pub-textarea" id="mDesc" placeholder="Descripción (opcional)..." maxlength="150"></textarea>
+        <div class="pub-footer">
+          <span class="pub-expiry-note">⏱ Se elimina automáticamente a las 24hs</span>
+          <button class="btn-publish" id="mPublishBtn">Publicar Item</button>
+        </div>
       </div>
       <div class="pub-status" id="mStatus"></div>
-
-      <div class="feed-header">
-        <span class="feed-label">Items disponibles</span>
-        <span class="live-dot">EN VIVO</span>
-      </div>
-      <div class="market-grid" id="marketGrid">
-        <div class="loading-state" style="grid-column:1/-1">CARGANDO ITEMS...</div>
-      </div>
+      <div class="feed-header"><span class="feed-label">Items disponibles</span><span class="live-dot">EN VIVO</span></div>
+      <div class="market-list" id="marketList"><div class="loading-state">CARGANDO ITEMS...</div></div>
     </div>
   </div>
 
@@ -356,9 +336,7 @@
   <div class="view" id="view-builds">
     <div class="main-content builds-view">
       <div class="view-header"><span class="view-header-icon">🛡</span><div><div class="view-header-title">Builds & Guías</div><div class="view-header-sub">Compartidas por la comunidad · Filtradas por clase</div></div></div>
-      <div class="class-tabs">
-        <button class="class-tab active">Todas</button><button class="class-tab">Warrior</button><button class="class-tab">Mage</button><button class="class-tab">Assassin</button><button class="class-tab">Archer</button><button class="class-tab">Paladin</button>
-      </div>
+      <div class="class-tabs"><button class="class-tab active">Todas</button><button class="class-tab">Warrior</button><button class="class-tab">Mage</button><button class="class-tab">Assassin</button><button class="class-tab">Archer</button><button class="class-tab">Paladin</button></div>
       <div class="builds-grid">
         <div class="build-card"><div class="build-top"><div class="build-name">Full Burst Assassin</div><div class="build-class">Assassin</div></div><div class="build-desc">Build de daño puro orientada a PvP. Abre con Shadow Blink, sigue con Void Slash x3 y cierra con Death Mark.</div><div class="build-meta"><div class="build-author">por <span>ShadowBlade</span></div><div class="build-diff"><div class="diff-dot filled"></div><div class="diff-dot filled"></div><div class="diff-dot filled"></div></div><div class="build-views">4.2k vistas</div></div></div>
         <div class="build-card"><div class="build-top"><div class="build-name">Tank Support Paladin</div><div class="build-class">Paladin</div></div><div class="build-desc">La build más pedida en GvG. Máxima resiliencia + auras de grupo.</div><div class="build-meta"><div class="build-author">por <span>VoidKnight</span></div><div class="build-diff"><div class="diff-dot filled"></div><div class="diff-dot filled"></div><div class="diff-dot"></div></div><div class="build-views">3.8k vistas</div></div></div>
@@ -399,10 +377,10 @@
       </div>
       <div class="upcoming-label">Próximos eventos</div>
       <div class="upcoming-list">
-        <div class="upcoming-card"><div class="upcoming-date">Jun 10</div><div><div class="upcoming-name">Guild Wars — Temporada 3</div><div class="upcoming-desc">Torneo masivo guild vs guild. Inscripciones abren el lunes.</div></div></div>
-        <div class="upcoming-card"><div class="upcoming-date">Jun 15</div><div><div class="upcoming-name">Rare Auction Night</div><div class="upcoming-desc">Subasta de items legendarios donados por la comunidad.</div></div></div>
-        <div class="upcoming-card"><div class="upcoming-date">Jun 20</div><div><div class="upcoming-name">World Boss — Kaelthar</div><div class="upcoming-desc">El boss del mes aparece en mapa abierto.</div></div></div>
-        <div class="upcoming-card"><div class="upcoming-date">Jun 28</div><div><div class="upcoming-name">Season End — Reset de Rankings</div><div class="upcoming-desc">Fin de temporada 3. Empieza la temporada 4.</div></div></div>
+        <div class="upcoming-card"><div class="upcoming-date">Jun 10</div><div><div class="upcoming-name">Guild Wars — Temporada 3</div><div class="upcoming-desc">Torneo masivo guild vs guild.</div></div></div>
+        <div class="upcoming-card"><div class="upcoming-date">Jun 15</div><div><div class="upcoming-name">Rare Auction Night</div><div class="upcoming-desc">Subasta de items legendarios.</div></div></div>
+        <div class="upcoming-card"><div class="upcoming-date">Jun 20</div><div><div class="upcoming-name">World Boss — Kaelthar</div><div class="upcoming-desc">El boss del mes en mapa abierto.</div></div></div>
+        <div class="upcoming-card"><div class="upcoming-date">Jun 28</div><div><div class="upcoming-name">Season End — Reset de Rankings</div><div class="upcoming-desc">Fin de temporada 3. Empieza la 4.</div></div></div>
       </div>
     </div>
   </div>
@@ -410,48 +388,43 @@
   <!-- NEWS -->
   <div class="view" id="view-news">
     <div class="main-content news-view">
-      <div class="view-header"><span class="view-header-icon">📰</span><div><div class="view-header-title">Noticias & Parches</div><div class="view-header-sub">Novedades del servidor · Compilado por la comunidad</div></div></div>
+      <div class="view-header"><span class="view-header-icon">📰</span><div><div class="view-header-title">Noticias & Parches</div><div class="view-header-sub">Novedades del servidor</div></div></div>
       <div class="news-featured">
         <span class="patch-tag tag-patch">PATCH 2.4.1</span>
         <div class="news-featured-title">Balance general de clases y corrección de bugs críticos en GvG</div>
-        <div class="news-featured-body">El equipo de desarrollo lanzó el parche 2.4.1 que rebalancéa el Assassin, buffs al Warrior y corrección del bug de duplicado de ítems en GvG.</div>
+        <div class="news-featured-body">El parche 2.4.1 rebalancéa el Assassin, buffs al Warrior y corrección del bug de duplicado de ítems en GvG.</div>
         <div class="news-meta"><span class="news-date">06 Jun 2026</span><a href="#" class="news-read-more">Leer completo →</a></div>
       </div>
       <div class="news-list">
-        <div class="news-row"><span class="patch-tag tag-event">EVENTO</span><div class="news-row-title">Double Drop Weekend confirmado — Empieza hoy a las 18:00 hs</div><div class="news-row-date">06 Jun 2026</div></div>
-        <div class="news-row"><span class="patch-tag tag-hotfix">HOTFIX</span><div class="news-row-title">Fix de crash en dungeon "Cavernas de Morghul" en party de 6</div><div class="news-row-date">04 Jun 2026</div></div>
-        <div class="news-row"><span class="patch-tag tag-news">NOTICIA</span><div class="news-row-title">Guild Wars Temporada 3 — Fechas confirmadas y sistema de puntos</div><div class="news-row-date">02 Jun 2026</div></div>
+        <div class="news-row"><span class="patch-tag tag-event">EVENTO</span><div class="news-row-title">Double Drop Weekend — Empieza hoy a las 18:00 hs</div><div class="news-row-date">06 Jun 2026</div></div>
+        <div class="news-row"><span class="patch-tag tag-hotfix">HOTFIX</span><div class="news-row-title">Fix de crash en dungeon "Cavernas de Morghul"</div><div class="news-row-date">04 Jun 2026</div></div>
+        <div class="news-row"><span class="patch-tag tag-news">NOTICIA</span><div class="news-row-title">Guild Wars Temporada 3 — Fechas confirmadas</div><div class="news-row-date">02 Jun 2026</div></div>
         <div class="news-row"><span class="patch-tag tag-patch">PATCH 2.4.0</span><div class="news-row-title">Nuevo dungeon: Torre de las Almas + 18 items exclusivos</div><div class="news-row-date">28 May 2026</div></div>
       </div>
     </div>
   </div>
 
-  <!-- RELIABLE / SELLERS -->
+  <!-- RELIABLE -->
   <div class="view" id="view-reliable">
     <div class="main-content reliable-view">
-      <div class="view-header">
-        <span class="view-header-icon">✅</span>
-        <div><div class="view-header-title">Vendedores Verificados</div><div class="view-header-sub">Registrate como vendedor · Avalado por la comunidad</div></div>
-      </div>
-
+      <div class="view-header"><span class="view-header-icon">✅</span><div><div class="view-header-title">Vendedores Verificados</div><div class="view-header-sub">Registrate · Se renueva cada 7 días</div></div></div>
       <div class="pub-box">
         <div class="pub-label">Registrarme como vendedor</div>
-        <input class="pub-input" id="sNick" type="text" placeholder="Tu nickname en el juego..." maxlength="30" />
-        <input class="pub-input" id="sTrades" type="text" placeholder="Cantidad de trades realizados..." maxlength="10" />
-        <input class="pub-input" id="sRating" type="text" placeholder="% de feedback positivo (ej: 99.5%)" maxlength="6" />
-        <textarea class="pub-textarea" id="sDesc" placeholder="Contá algo sobre vos: qué vendés, horarios, contacto..." maxlength="200"></textarea>
-        <div class="pub-footer"><button class="btn-publish" id="sPublishBtn">Registrarme</button></div>
+        <input class="pub-input" id="sNick" type="text" placeholder="Tu nickname en el juego..." maxlength="30"/>
+        <div class="pub-row">
+          <input class="pub-input" id="sTrades" type="text" placeholder="Trades realizados..." maxlength="10"/>
+          <input class="pub-input" id="sRating" type="text" placeholder="Feedback % (ej: 99.5%)" maxlength="6"/>
+        </div>
+        <textarea class="pub-textarea" id="sDesc" placeholder="Qué vendés, horarios, cómo contactarte..." maxlength="200"></textarea>
+        <div class="pub-footer">
+          <span class="pub-expiry-note">⏱ Se elimina automáticamente a los 7 días</span>
+          <button class="btn-publish" id="sPublishBtn">Registrarme</button>
+        </div>
       </div>
       <div class="pub-status" id="sStatus"></div>
-
       <div class="verified-badge-big">✅ Vendedores registrados por la comunidad</div>
-      <div class="feed-header">
-        <span class="feed-label">Vendedores activos</span>
-        <span class="live-dot">EN VIVO</span>
-      </div>
-      <div class="sellers-list" id="sellersList">
-        <div class="loading-state">CARGANDO VENDEDORES...</div>
-      </div>
+      <div class="feed-header"><span class="feed-label">Vendedores activos</span><span class="live-dot">EN VIVO</span></div>
+      <div class="sellers-list" id="sellersList"><div class="loading-state">CARGANDO VENDEDORES...</div></div>
     </div>
   </div>
 
@@ -459,12 +432,7 @@
   <div class="view" id="view-community">
     <div class="main-content community-view">
       <div class="view-header"><span class="view-header-icon">👥</span><div><div class="view-header-title">Comunidad</div><div class="view-header-sub">Donde vive el juego de verdad</div></div></div>
-      <div class="discord-banner">
-        <span class="discord-icon">🎮</span>
-        <div class="discord-title">SERVIDOR DE DISCORD</div>
-        <div class="discord-desc">Más de 8,000 jugadores activos. Canales de trading, builds, eventos en vivo, reportes y mucho más.</div>
-        <a href="#" class="btn-discord">Unirse al Discord</a>
-      </div>
+      <div class="discord-banner"><span class="discord-icon">🎮</span><div class="discord-title">SERVIDOR DE DISCORD</div><div class="discord-desc">Más de 8,000 jugadores activos. Canales de trading, builds, eventos en vivo y mucho más.</div><a href="#" class="btn-discord">Unirse al Discord</a></div>
       <div class="social-grid">
         <a href="#" class="social-card"><span class="social-icon">📘</span><div><div class="social-name">Facebook</div><div class="social-handle">@AurcusOnlineComunidad</div></div></a>
         <a href="#" class="social-card"><span class="social-icon">📸</span><div><div class="social-name">Instagram</div><div class="social-handle">@aurcus.hub</div></div></a>
@@ -485,13 +453,10 @@
   <!-- FORO -->
   <div class="view" id="view-foro">
     <div class="main-content foro-view">
-      <div class="view-header">
-        <span class="view-header-icon">💬</span>
-        <div><div class="view-header-title">Foro</div><div class="view-header-sub">Publicaciones de la comunidad · En tiempo real</div></div>
-      </div>
+      <div class="view-header"><span class="view-header-icon">💬</span><div><div class="view-header-title">Foro</div><div class="view-header-sub">Publicaciones de la comunidad · Se borran a las 48hs</div></div></div>
       <div class="pub-box">
         <div class="pub-label">Nueva publicación</div>
-        <input class="pub-input" id="fNick" type="text" placeholder="Tu nickname en el juego..." maxlength="30" />
+        <input class="pub-input" id="fNick" type="text" placeholder="Tu nickname en el juego..." maxlength="30"/>
         <textarea class="pub-textarea" id="fContent" placeholder="¿Qué querés compartir con la comunidad?" maxlength="300"></textarea>
         <div class="pub-footer">
           <span class="char-count" id="charCount">0 / 300</span>
@@ -499,17 +464,11 @@
         </div>
       </div>
       <div class="pub-status" id="fStatus"></div>
-      <div class="feed-header">
-        <span class="feed-label">Publicaciones recientes</span>
-        <span class="live-dot">EN VIVO</span>
-      </div>
-      <div class="foro-feed" id="foroFeed">
-        <div class="loading-state">CARGANDO PUBLICACIONES...</div>
-      </div>
+      <div class="feed-header"><span class="feed-label">Publicaciones recientes</span><span class="live-dot">EN VIVO</span></div>
+      <div class="foro-feed" id="foroFeed"><div class="loading-state">CARGANDO PUBLICACIONES...</div></div>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer" id="site-footer">
     <div class="footer-logo">⚔ AURCUS ONLINE</div>
     <p class="footer-text">Hub comunitario no oficial. No afiliado con los desarrolladores del juego.</p>
@@ -525,7 +484,7 @@
 
   <script src="script.js"></script>
   <script>
-    /* ── SPA NAVIGATION ── */
+    /* ── SPA ── */
     const flash = document.getElementById('flash-overlay');
     const views = document.querySelectorAll('.view');
     function showView(id) {
@@ -535,17 +494,14 @@
         const t = document.getElementById('view-' + id);
         if (t) t.classList.add('active');
         document.querySelectorAll('.drawer-item').forEach(i => i.classList.toggle('nav-active', i.dataset.nav === id));
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        window.scrollTo({ top:0, behavior:'instant' });
         flash.classList.remove('flash-in'); flash.classList.add('flash-out');
       }, 90);
     }
-    document.querySelectorAll('[data-nav]').forEach(el => {
-      el.addEventListener('click', e => { e.preventDefault(); showView(el.dataset.nav); closeDrawer(); });
-    });
-    const cd1 = document.getElementById('countdown'), cd2 = document.getElementById('countdown2');
-    if (cd1 && cd2) new MutationObserver(() => { cd2.textContent = cd1.textContent; }).observe(cd1, { childList: true });
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }));
-    document.querySelectorAll('.class-tab').forEach(tab => tab.addEventListener('click', () => { document.querySelectorAll('.class-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active'); }));
+    document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); showView(el.dataset.nav); closeDrawer(); }));
+    const cd1=document.getElementById('countdown'), cd2=document.getElementById('countdown2');
+    if(cd1&&cd2) new MutationObserver(()=>{ cd2.textContent=cd1.textContent; }).observe(cd1,{childList:true});
+    document.querySelectorAll('.class-tab').forEach(t => t.addEventListener('click',()=>{ document.querySelectorAll('.class-tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); }));
 
     /* ── SUPABASE ── */
     const { createClient } = supabase;
@@ -554,98 +510,155 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZndsZmR5cHB4bnB0dGt1anNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NTYzOTIsImV4cCI6MjA5NjQzMjM5Mn0.zwKkYjpRcAa1dVFp7cXr2YSC0rxJ-cDS_OYQg8ijMUc'
     );
 
+    /* ── EXPIRY TIMES ── */
+    const MARKET_HOURS  = 24;   // market: 24 horas
+    const SELLERS_DAYS  = 7;    // sellers: 7 días
+    const FORO_HOURS    = 48;   // foro: 48 horas
+
     const AVATARS = ['⚔','🛡','🔮','🏹','🪄','🗡','💀','🔥','❄️','⚡'];
-    function getAvatar(nick) { let s=0; for(let c of (nick||'?')) s+=c.charCodeAt(0); return AVATARS[s%AVATARS.length]; }
-    function timeAgo(ts) { const d=Math.floor((Date.now()-new Date(ts))/1000); if(d<60) return 'ahora mismo'; if(d<3600) return `hace ${Math.floor(d/60)} min`; if(d<86400) return `hace ${Math.floor(d/3600)}h`; return `hace ${Math.floor(d/86400)}d`; }
-    function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    function showStatus(el, msg, type) { el.textContent=msg; el.className='pub-status '+type; setTimeout(()=>{ el.className='pub-status'; },3000); }
+    function getAvatar(nick){ let s=0; for(let c of (nick||'?')) s+=c.charCodeAt(0); return AVATARS[s%AVATARS.length]; }
+    function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function showStatus(el,msg,type){ el.textContent=msg; el.className='pub-status '+type; setTimeout(()=>{ el.className='pub-status'; },3500); }
+
+    function timeAgo(ts){
+      const d=Math.floor((Date.now()-new Date(ts))/1000);
+      if(d<60) return 'ahora mismo';
+      if(d<3600) return `hace ${Math.floor(d/60)}min`;
+      if(d<86400) return `hace ${Math.floor(d/3600)}h`;
+      return `hace ${Math.floor(d/86400)}d`;
+    }
+
+    function expiryBadge(ts, hours){
+      const msLeft = (new Date(ts).getTime() + hours*3600000) - Date.now();
+      if(msLeft <= 0) return '<span class="expiry-badge urgent">⏱ Expirado</span>';
+      const hLeft = Math.floor(msLeft/3600000);
+      const mLeft = Math.floor((msLeft%3600000)/60000);
+      const urgent = hLeft < 3;
+      const label = hLeft >= 24 ? `${Math.floor(hLeft/24)}d` : hLeft > 0 ? `${hLeft}h ${mLeft}m` : `${mLeft}m`;
+      return `<span class="expiry-badge ${urgent?'urgent':''}">⏱ ${label}</span>`;
+    }
+
+    /* Auto-delete expired records on load */
+    async function cleanExpired(){
+      const now = new Date().toISOString();
+      const marketCutoff  = new Date(Date.now() - MARKET_HOURS*3600000).toISOString();
+      const sellersCutoff = new Date(Date.now() - SELLERS_DAYS*24*3600000).toISOString();
+      const foroCutoff    = new Date(Date.now() - FORO_HOURS*3600000).toISOString();
+      await db.from('market').delete().lt('created_at', marketCutoff);
+      await db.from('sellers').delete().lt('created_at', sellersCutoff);
+      await db.from('post').delete().lt('created_at', foroCutoff);
+    }
+    cleanExpired();
 
     /* ── MARKET ── */
-    const marketGrid  = document.getElementById('marketGrid');
+    const marketList  = document.getElementById('marketList');
     const mStatus     = document.getElementById('mStatus');
     const mPublishBtn = document.getElementById('mPublishBtn');
-    const RARITY_LABELS = { legendary:'★ Legendario', epic:'◆ Épico', rare:'● Raro', common:'○ Común' };
-    const RARITY_CLASSES = { legendary:'rarity-legendary', epic:'rarity-epic', rare:'rarity-rare', common:'rarity-common' };
 
-    function renderMarketItem(item, prepend=false) {
+    function renderMarketItem(item, prepend=false){
+      const star = parseInt(item.rarity)||1;
       const card = document.createElement('div');
-      card.className = 'market-item';
+      card.className = `market-row star-${star}`;
+      card.dataset.id = item.id;
       card.innerHTML = `
-        <div class="item-rarity ${RARITY_CLASSES[item.rarity]||'rarity-common'}">${esc(RARITY_LABELS[item.rarity]||item.rarity)}</div>
-        <div class="item-name">${esc(item.item_name)}</div>
-        <div class="item-seller">por ${esc(item.nickname)} · ${timeAgo(item.created_at)}</div>
-        <div class="item-desc">${esc(item.description)}</div>
-        <div class="item-price">${esc(item.price)} <span class="item-price-unit">gold</span></div>`;
-      if (prepend) marketGrid.insertBefore(card, marketGrid.firstChild);
-      else marketGrid.appendChild(card);
+        <div class="market-row-badge">
+          <div class="market-row-star">★${star}</div>
+          <div class="market-row-lv">Lv${esc(String(item.level||'?'))}</div>
+          <div class="market-row-qty">x${esc(String(item.quantity||1))}</div>
+        </div>
+        <div class="market-row-info">
+          <div class="market-row-name">${esc(item.item_name)}</div>
+          <div class="market-row-meta">
+            <span class="market-row-seller">👤 ${esc(item.nickname)} · ${timeAgo(item.created_at)}</span>
+            ${expiryBadge(item.created_at, MARKET_HOURS)}
+          </div>
+          ${item.description?`<div class="market-row-desc">${esc(item.description)}</div>`:''}
+        </div>
+        <div class="market-row-price">
+          <span class="market-row-price-val">${esc(item.price)}</span>
+          <span class="market-row-price-unit">gold</span>
+        </div>`;
+      if(prepend) marketList.insertBefore(card, marketList.firstChild);
+      else marketList.appendChild(card);
     }
 
-    async function loadMarket() {
-      const { data, error } = await db.from('market').select('*').order('created_at',{ascending:false}).limit(50);
-      marketGrid.innerHTML = '';
-      if (error || !data || !data.length) { marketGrid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">💰</span>No hay items aún. ¡Sé el primero!</div>'; return; }
-      data.forEach(i => renderMarketItem(i));
+    async function loadMarket(){
+      const cutoff = new Date(Date.now() - MARKET_HOURS*3600000).toISOString();
+      const { data, error } = await db.from('market').select('*').gt('created_at', cutoff).order('created_at',{ascending:false}).limit(100);
+      marketList.innerHTML='';
+      if(error||!data||!data.length){ marketList.innerHTML='<div class="empty-state"><span class="empty-icon">💰</span>No hay items aún. ¡Sé el primero!</div>'; return; }
+      data.forEach(i=>renderMarketItem(i));
     }
 
-    mPublishBtn.addEventListener('click', async () => {
-      const nick=document.getElementById('mNick').value.trim();
-      const name=document.getElementById('mName').value.trim();
-      const rarity=document.getElementById('mRarity').value;
-      const price=document.getElementById('mPrice').value.trim();
-      const desc=document.getElementById('mDesc').value.trim();
-      if (!nick||!name||!rarity||!price) { showStatus(mStatus,'⚠ Completá todos los campos obligatorios.','err'); return; }
+    mPublishBtn.addEventListener('click', async()=>{
+      const nick   = document.getElementById('mNick').value.trim();
+      const name   = document.getElementById('mName').value.trim();
+      const rarity = document.getElementById('mRarity').value;
+      const level  = parseInt(document.getElementById('mLevel').value);
+      const qty    = parseInt(document.getElementById('mQty').value);
+      const price  = document.getElementById('mPrice').value.trim();
+      const desc   = document.getElementById('mDesc').value.trim();
+      if(!nick||!name||!rarity||!price){ showStatus(mStatus,'⚠ Completá nickname, nombre, rango y precio.','err'); return; }
+      if(level&&(level<1||level>115)){ showStatus(mStatus,'⚠ El nivel debe ser entre 1 y 115.','err'); return; }
+      if(qty&&(qty<1||qty>9999)){ showStatus(mStatus,'⚠ La cantidad debe ser entre 1 y 9999.','err'); return; }
       mPublishBtn.disabled=true; mPublishBtn.textContent='Publicando...';
-      const { error } = await db.from('market').insert({ nickname:nick, item_name:name, rarity, price, description:desc });
+      const { error } = await db.from('market').insert({ nickname:nick, item_name:name, rarity, level:level||null, quantity:qty||null, price, description:desc });
       mPublishBtn.disabled=false; mPublishBtn.textContent='Publicar Item';
-      if (error) { showStatus(mStatus,'❌ Error al publicar.','err'); }
-      else { document.getElementById('mName').value=''; document.getElementById('mPrice').value=''; document.getElementById('mDesc').value=''; document.getElementById('mRarity').value=''; showStatus(mStatus,'✅ Item publicado.','ok'); }
+      if(error){ showStatus(mStatus,'❌ Error al publicar.','err'); }
+      else{
+        ['mName','mPrice','mDesc','mLevel','mQty'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('mRarity').value='';
+        showStatus(mStatus,'✅ Item publicado. Se borrará en 24hs.','ok');
+      }
     });
 
     db.channel('market-ch').on('postgres_changes',{event:'INSERT',schema:'public',table:'market'},p=>{
-      const e=marketGrid.querySelector('.empty-state'); if(e) e.remove();
+      const e=marketList.querySelector('.empty-state'); if(e) e.remove();
       renderMarketItem(p.new,true);
     }).subscribe();
     loadMarket();
 
     /* ── SELLERS ── */
-    const sellersList  = document.getElementById('sellersList');
-    const sStatus      = document.getElementById('sStatus');
-    const sPublishBtn  = document.getElementById('sPublishBtn');
+    const sellersList = document.getElementById('sellersList');
+    const sStatus     = document.getElementById('sStatus');
+    const sPublishBtn = document.getElementById('sPublishBtn');
 
-    function renderSeller(s, prepend=false) {
-      const card = document.createElement('div');
-      card.className = 'seller-card';
-      card.innerHTML = `
+    function renderSeller(s, prepend=false){
+      const card=document.createElement('div'); card.className='seller-card'; card.dataset.id=s.id;
+      card.innerHTML=`
         <div class="seller-card-top">
           <div class="seller-avatar">${getAvatar(s.nickname)}</div>
           <div>
-            <div class="seller-card-name">${esc(s.nickname)}</div>
-            <div class="seller-card-trades">🔁 ${esc(s.trades)} trades · <span class="seller-card-rating">✅ ${esc(s.rating)}</span></div>
+            <div class="seller-card-name">${esc(s.nickname)} ${expiryBadge(s.created_at, SELLERS_DAYS*24)}</div>
+            <div class="seller-card-stats">
+              <span class="seller-stat-pill trades">🔁 ${esc(s.trades)} trades</span>
+              <span class="seller-stat-pill rating">✅ ${esc(s.rating)}</span>
+            </div>
           </div>
         </div>
         <div class="seller-card-desc">${esc(s.description)}</div>`;
-      if (prepend) sellersList.insertBefore(card, sellersList.firstChild);
-      else sellersList.appendChild(card);
+      if(prepend) sellersList.insertBefore(card,sellersList.firstChild); else sellersList.appendChild(card);
     }
 
-    async function loadSellers() {
-      const { data, error } = await db.from('sellers').select('*').order('created_at',{ascending:false}).limit(50);
-      sellersList.innerHTML = '';
-      if (error || !data || !data.length) { sellersList.innerHTML='<div class="empty-state"><span class="empty-icon">✅</span>No hay vendedores aún. ¡Registrate!</div>'; return; }
-      data.forEach(s => renderSeller(s));
+    async function loadSellers(){
+      const cutoff = new Date(Date.now() - SELLERS_DAYS*24*3600000).toISOString();
+      const { data, error } = await db.from('sellers').select('*').gt('created_at',cutoff).order('created_at',{ascending:false}).limit(50);
+      sellersList.innerHTML='';
+      if(error||!data||!data.length){ sellersList.innerHTML='<div class="empty-state"><span class="empty-icon">✅</span>No hay vendedores aún. ¡Registrate!</div>'; return; }
+      data.forEach(s=>renderSeller(s));
     }
 
-    sPublishBtn.addEventListener('click', async () => {
-      const nick=document.getElementById('sNick').value.trim();
+    sPublishBtn.addEventListener('click', async()=>{
+      const nick  =document.getElementById('sNick').value.trim();
       const trades=document.getElementById('sTrades').value.trim();
       const rating=document.getElementById('sRating').value.trim();
-      const desc=document.getElementById('sDesc').value.trim();
-      if (!nick||!trades||!rating) { showStatus(sStatus,'⚠ Completá nickname, trades y rating.','err'); return; }
+      const desc  =document.getElementById('sDesc').value.trim();
+      if(!nick||!trades||!rating){ showStatus(sStatus,'⚠ Completá nickname, trades y rating.','err'); return; }
       sPublishBtn.disabled=true; sPublishBtn.textContent='Registrando...';
       const { error } = await db.from('sellers').insert({ nickname:nick, trades, rating, description:desc });
       sPublishBtn.disabled=false; sPublishBtn.textContent='Registrarme';
-      if (error) { showStatus(sStatus,'❌ Error al registrar.','err'); }
-      else { document.getElementById('sNick').value=''; document.getElementById('sTrades').value=''; document.getElementById('sRating').value=''; document.getElementById('sDesc').value=''; showStatus(sStatus,'✅ Registrado exitosamente.','ok'); }
+      if(error){ showStatus(sStatus,'❌ Error al registrar.','err'); }
+      else{ ['sNick','sTrades','sRating','sDesc'].forEach(id=>document.getElementById(id).value=''); showStatus(sStatus,'✅ Registrado. Se borrará en 7 días.','ok'); }
     });
 
     db.channel('sellers-ch').on('postgres_changes',{event:'INSERT',schema:'public',table:'sellers'},p=>{
@@ -660,31 +673,38 @@
     const fPublishBtn= document.getElementById('fPublishBtn');
     const charCount  = document.getElementById('charCount');
 
-    function renderPost(p, prepend=false) {
-      const card=document.createElement('div'); card.className='post-card';
-      card.innerHTML=`<div class="post-top"><div class="post-avatar">${getAvatar(p.nickname)}</div><div class="post-nick">${esc(p.nickname)}</div><div class="post-time">${timeAgo(p.created_at)}</div></div><div class="post-content">${esc(p.content)}</div>`;
-      if (prepend) foroFeed.insertBefore(card,foroFeed.firstChild); else foroFeed.appendChild(card);
+    function renderPost(p, prepend=false){
+      const card=document.createElement('div'); card.className='post-card'; card.dataset.id=p.id;
+      card.innerHTML=`
+        <div class="post-top">
+          <div class="post-avatar">${getAvatar(p.nickname)}</div>
+          <div class="post-nick">${esc(p.nickname)}</div>
+          <div class="post-time">${timeAgo(p.created_at)} ${expiryBadge(p.created_at, FORO_HOURS)}</div>
+        </div>
+        <div class="post-content">${esc(p.content)}</div>`;
+      if(prepend) foroFeed.insertBefore(card,foroFeed.firstChild); else foroFeed.appendChild(card);
     }
 
-    async function loadForo() {
-      const { data, error } = await db.from('post').select('*').order('created_at',{ascending:false}).limit(50);
+    async function loadForo(){
+      const cutoff = new Date(Date.now() - FORO_HOURS*3600000).toISOString();
+      const { data, error } = await db.from('post').select('*').gt('created_at',cutoff).order('created_at',{ascending:false}).limit(50);
       foroFeed.innerHTML='';
-      if (error||!data||!data.length) { foroFeed.innerHTML='<div class="empty-state"><span class="empty-icon">💬</span>Sé el primero en publicar algo.</div>'; return; }
+      if(error||!data||!data.length){ foroFeed.innerHTML='<div class="empty-state"><span class="empty-icon">💬</span>Sé el primero en publicar algo.</div>'; return; }
       data.forEach(p=>renderPost(p));
     }
 
-    document.getElementById('fContent').addEventListener('input', function(){ charCount.textContent=`${this.value.length} / 300`; });
+    document.getElementById('fContent').addEventListener('input',function(){ charCount.textContent=`${this.value.length} / 300`; });
 
-    fPublishBtn.addEventListener('click', async () => {
-      const nick=document.getElementById('fNick').value.trim();
+    fPublishBtn.addEventListener('click', async()=>{
+      const nick   =document.getElementById('fNick').value.trim();
       const content=document.getElementById('fContent').value.trim();
-      if (!nick) { showStatus(fStatus,'⚠ Escribí tu nickname.','err'); return; }
-      if (!content) { showStatus(fStatus,'⚠ Escribí algo antes de publicar.','err'); return; }
+      if(!nick){ showStatus(fStatus,'⚠ Escribí tu nickname.','err'); return; }
+      if(!content){ showStatus(fStatus,'⚠ Escribí algo antes de publicar.','err'); return; }
       fPublishBtn.disabled=true; fPublishBtn.textContent='Publicando...';
       const { error } = await db.from('post').insert({ nickname:nick, content });
       fPublishBtn.disabled=false; fPublishBtn.textContent='Publicar';
-      if (error) { showStatus(fStatus,'❌ Error al publicar.','err'); }
-      else { document.getElementById('fContent').value=''; charCount.textContent='0 / 300'; showStatus(fStatus,'✅ Publicado.','ok'); }
+      if(error){ showStatus(fStatus,'❌ Error al publicar.','err'); }
+      else{ document.getElementById('fContent').value=''; charCount.textContent='0 / 300'; showStatus(fStatus,'✅ Publicado. Se borrará en 48hs.','ok'); }
     });
 
     db.channel('post-ch').on('postgres_changes',{event:'INSERT',schema:'public',table:'post'},p=>{
