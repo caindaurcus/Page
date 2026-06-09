@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aurcus Online — Community Hub</title>
+  <title>Aurcus Online — Community Hub v6.0</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
   
   <link rel="stylesheet" href="style.css"/>
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -19,38 +21,82 @@
   <div class="bg-particles" id="bgParticles"></div>
   <div id="flash-overlay"></div>
 
-  <div class="lang-selector" id="langSelector">
-    <button class="lang-toggle" id="langToggle" title="Cambiar idioma">
-      <span class="lang-globe">🌐</span>
-      <span class="lang-current" id="langCurrent">ES</span>
-      <span class="lang-arrow">▾</span>
+  <header class="top-bar glass-panel">
+    
+    <button id="menuToggle" class="menu-btn" title="Abrir Menú">
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
-    <div class="lang-dropdown" id="langDropdown">
-      <div class="lang-option" data-lang="ES">Español</div>
-      <div class="lang-option" data-lang="EN">English</div>
+    
+    <div class="header-titles">
+      <h1 class="brand-title-small">AURCUS ONLINE</h1>
+      <p class="brand-subtitle-small">COMMUNITY HUB v6.0</p>
     </div>
-  </div>
 
-  <main class="main-container">
-    <header class="hub-header">
-      <h1 class="brand-title">AURCUS ONLINE</h1>
-      <p class="brand-subtitle">COMMUNITY HUB v6.0</p>
-    </header>
+    <div class="lang-selector-inline" id="langSelector">
+      <button class="lang-toggle" id="langToggle">
+        <span class="lang-globe">🌐</span> 
+        <span id="langCurrent">ES</span> ▾
+      </button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option" data-lang="ES">Español</div>
+        <div class="lang-option" data-lang="EN">English</div>
+      </div>
+    </div>
+  </header>
 
-    <section class="forum-section">
+  <nav id="sideNav" class="side-nav glass-panel hidden">
+    <ul class="nav-links">
+      <li><button class="nav-btn active" data-target="forumSection">💬 Foro</button></li>
+      <li><button class="nav-btn" data-target="marketSection">💰 Market</button></li>
+      <li><button class="nav-btn" data-target="sellersSection">✅ Sellers</button></li>
+    </ul>
+  </nav>
+
+  <main class="main-content">
+    
+    <section id="forumSection" class="content-section active-section">
       <div class="glass-panel text-area-panel">
-        <h2 class="panel-title">Crear Publicación</h2>
+        <h2 class="panel-title">Foro en Vivo</h2>
         <div id="fs" class="status-message"></div>
-        <textarea id="fContent" maxlength="300" placeholder="Escribe algo para la comunidad..."></textarea>
+        <textarea id="fContent" maxlength="300" placeholder="¿Qué quieres compartir con la comunidad de Aurcus?"></textarea>
         <div class="panel-footer">
           <span id="cc" class="char-counter">0 / 300</span>
           <button id="fPublishBtn" class="btn-primary">Publicar</button>
         </div>
       </div>
-
+      
       <div id="ff" class="posts-container">
         </div>
     </section>
+
+    <section id="marketSection" class="content-section hidden">
+      <div class="glass-panel">
+        <h2 class="panel-title">Market Comercial</h2>
+        <p class="text-muted" style="margin-bottom: 15px;">Encuentra y ofrece ítems. Los listados se borran automáticamente en 24hs.</p>
+        <div class="market-controls">
+          <button id="btnSell" class="btn-primary">Publicar Venta</button>
+        </div>
+      </div>
+      
+      <div id="marketList" class="posts-container">
+        </div>
+    </section>
+
+    <section id="sellersSection" class="content-section hidden">
+      <div class="glass-panel">
+        <h2 class="panel-title">Vendedores Verificados</h2>
+        <p class="text-muted" style="margin-bottom: 15px;">Comerciantes confiables registrados por la comunidad. Renovable cada 7 días.</p>
+        <div class="market-controls">
+          <button id="btnRegisterSeller" class="btn-primary">Registrarme</button>
+        </div>
+      </div>
+      
+      <div id="sellersList" class="posts-container">
+        </div>
+    </section>
+
   </main>
 
 </body>
