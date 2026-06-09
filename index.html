@@ -647,5 +647,36 @@ loadRankings();
 
 const sl=document.getElementById("sellersList"),ss=document.getElementById("sStatus");
 document.getElementById("sPublishBtn").addEventListener("click",async()=>{
-  const nick=document.getElementById("sNick").value.trim(),trades=document.getElementById("sTrades").value.trim(),rating=document.getElementById(
+  const nick=document.getElementById("sNick").value.trim(),trades=document.getElementById("sTrades").value.trim(),rating=document.getElementById("sRating").value.trim(),desc=document.getElementById("sDesc").value.trim();
+  if(!nick||!trades||!rating){sta(ss,"Completa nickname, trades y rating.","err");return;}
+  const b=document.getElementById("sPublishBtn");b.disabled=true;b.textContent="Registrando...";
+  const{error}=await db.from("sellers").insert({nickname:nick,trades,rating,description:desc});
+  b.disabled=false;b.textContent="Registrarme";
+  if(error)sta(ss,"Error al registrar.","err");
+  else{["sNick","sTrades","sRating","sDesc"].forEach(id=>document.getElementById(id).value="");sta(ss,"Registrado. Se borrara en 7 dias.","ok");}
+});
+function rsl(s,pre=false){const c=document.createElement("div");c.className="seller-card";c.innerHTML="<div class=\"seller-card-top\"><div class=\"seller-avatar\">"+gav(s.nickname)+"</div><div><div class=\"seller-card-name\">"+esc(s.nickname)+" "+exb(s.created_at,SH)+"</div><div class=\"seller-card-stats\"><span class=\"seller-stat-pill trades\">"+esc(s.trades)+" trades</span><span class=\"seller-stat-pill rating\">"+esc(s.rating)+"</span></div></div></div><div class=\"seller-card-desc\">"+esc(s.description)+"</div>";if(pre)sl.insertBefore(c,sl.firstChild);else sl.appendChild(c);}
+async function loadSellers(){const{data,error}=await db.from("sellers").select("*").gt("created_at",new Date(Date.now()-SH*3600000).toISOString()).order("created_at",{ascending:false}).limit(50);sl.innerHTML="";if(error||!data||!data.length){sl.innerHTML="<div class=\"empty-state\"><span class=\"empty-icon\">&#9989;</span><span class=\"empty-text\">No hay vendedores aun</span></div>";return;}data.forEach(s=>rsl(s));}
+db.channel("sel").on("postgres_changes",{event:"INSERT",schema:"public",table:"sellers"},p=>{const e=sl.querySelector(".empty-state");if(e)e.remove();rsl(p.new,true);}).subscribe();
+loadSellers();
+
+const ff=document.getElementById("foroFeed"),fs=document.getElementById("fStatus"),cc=document.getElementById("charCount");
+document.getElementById("fContent").addEventListener("input",function(){cc.textContent=this.value.length+" / 300";});
+document.getElementById("fPublishBtn").addEventListener("click",async()=>{
+  const nick=document.getElementById("fNick").value.trim(),content=document.getElementById("fContent").value.trim();
+  if(!nick){sta(fs,"Escribi tu nickname.","err");return;}
+  if(!content){sta(fs,"Escribi algo antes de publicar.","err");return;}
+  const b=document.getElementById("fPublishBtn");b.disabled=true;b.textContent="Publicando...";
+  const{error}=await db.from("post").insert({nickname:nick,content});
+  b.disabled=false;b.textContent="Publicar";
+  if(error)sta(fs,"Error al publicar.","err");
+  else{document.getElementById("fContent").value="";cc.textContent="0 / 300";sta(fs,"Publicado. Se borrara en 48hs.","ok");}
+});
+function rpst(p,pre=false){const c=document.createElement("div");c.className="post-card";c.innerHTML="<div class=\"post-top\"><div class=\"post-avatar\">"+gav(p.nickname)+"</div><div class=\"post-nick\">"+esc(p.nickname)+"</div><div class=\"post-time\">"+tago(p.created_at)+" "+exb(p.created_at,FH)+"</div></div><div class=\"post-content\">"+esc(p.content)+"</div>";if(pre)ff.insertBefore(c,ff.firstChild);else ff.appendChild(c);}
+async function loadForo(){const{data,error}=await db.from("post").select("*").gt("created_at",new Date(Date.now()-FH*3600000).toISOString()).order("created_at",{ascending:false}).limit(50);ff.innerHTML="";if(error||!data||!data.length){ff.innerHTML="<div class=\"empty-state\"><span class=\"empty-icon\">&#128172;</span><span class=\"empty-text\">Se el primero en publicar</span></div>";return;}data.forEach(p=>rpst(p));}
+db.channel("fro").on("postgres_changes",{event:"INSERT",schema:"public",table:"post"},p=>{const e=ff.querySelector(".empty-state");if(e)e.remove();rpst(p.new,true);}).subscribe();
+loadForo();
+</script>
+</body>
+</html>
    
