@@ -983,4 +983,79 @@ function exb(ts,h){const ms=(new Date(ts).getTime()+h*3600000)-Date.now();if(ms<
 
 async function cleanExpired(){
   await db.from('market').delete().lt('created_at',new Date(Date.now()-MH*3600000).toISOString());
-  await db.from('sellers').delete().lt('created_at',new Date(Date.now()-SH*3600000).toISOStrin
+  await db.from('sellers').delete().lt('created_at',new Date(Date.now()-SH*3600000).toISOString());
+  await db.from('post').delete().lt('created_at',new Date(Date.now()-FH*3600000).toISOString());
+  await db.from('rankings').delete().lt('created_at',new Date(Date.now()-RH*3600000).toISOString());
+}
+cleanExpired();
+
+// MARKET
+const ml=document.getElementById('marketList'),ms=document.getElementById('mStatus');
+document.getElementById('mPublishBtn').addEventListener('click',async()=>{
+  const nick=document.getElementById('mNick').value.trim(),name=document.getElementById('mName').value.trim(),rarity=document.getElementById('mRarity').value,level=parseInt(document.getElementById('mLevel').value),qty=parseInt(document.getElementById('mQty').value),price=document.getElementById('mPrice').value.trim(),desc=document.getElementById('mDesc').value.trim();
+  if(!nick||!name||!rarity||!price){sta(ms,t('err_fill'),'err');return;}
+  const b=document.getElementById('mPublishBtn');b.disabled=true;b.textContent='...';
+  const{error}=await db.from('market').insert({nickname:nick,item_name:name,rarity,level:level||null,quantity:qty||null,price,description:desc});
+  b.disabled=false;b.textContent=t('btn_publish_item');
+  if(error)sta(ms,t('err_publish'),'err');
+  else{['mName','mPrice','mDesc','mLevel','mQty'].forEach(id=>document.getElementById(id).value='');document.getElementById('mRarity').value='';sta(ms,t('ok_item'),'ok');}
+});
+function rmi(item,pre=false){const star=parseInt(item.rarity)||1;const c=document.createElement('div');c.className='market-row star-'+star;c.innerHTML='<div class="market-row-badge"><div class="market-row-star">★'+star+'</div><div class="market-row-lv">Lv'+esc(String(item.level||'?'))+'</div><div class="market-row-qty">x'+esc(String(item.quantity||1))+'</div></div><div class="market-row-info"><div class="market-row-name">'+esc(item.item_name)+'</div><div class="market-row-meta"><span class="market-row-seller">'+esc(item.nickname)+' · '+tago(item.created_at)+'</span>'+exb(item.created_at,MH)+'</div>'+(item.description?'<div class="market-row-desc">'+esc(item.description)+'</div>':'')+'</div><div class="market-row-price"><span class="market-row-price-val">'+esc(item.price)+'</span><span class="market-row-price-unit">gold</span></div>';if(pre)ml.insertBefore(c,ml.firstChild);else ml.appendChild(c);}
+async function loadMarket(){const{data,error}=await db.from('market').select('*').gt('created_at',new Date(Date.now()-MH*3600000).toISOString()).order('created_at',{ascending:false}).limit(100);ml.innerHTML='';if(error||!data||!data.length){ml.innerHTML='<div class="empty-state"><span class="empty-icon">💰</span><span class="empty-text">'+t('no_items')+'</span></div>';return;}data.forEach(i=>rmi(i));}
+db.channel('mkt').on('postgres_changes',{event:'INSERT',schema:'public',table:'market'},p=>{const e=ml.querySelector('.empty-state');if(e)e.remove();rmi(p.new,true);}).subscribe();
+loadMarket();
+
+// RANKINGS
+const rc=document.getElementById('rankCards'),rs=document.getElementById('rStatus');
+function getYtId(url){const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);return m?m[1]:null;}
+document.getElementById('rPublishBtn').addEventListener('click',async()=>{
+  const nick=document.getElementById('rNick').value.trim(),cls=document.getElementById('rClass').value.trim(),yt=document.getElementById('rYt').value.trim(),desc=document.getElementById('rDesc').value.trim();
+  if(!nick||!yt){sta(rs,t('err_yt_fill'),'err');return;}
+  if(!getYtId(yt)){sta(rs,t('err_yt_invalid'),'err');return;}
+  const b=document.getElementById('rPublishBtn');b.disabled=true;b.textContent='...';
+  const{error}=await db.from('rankings').insert({nickname:nick,class:cls,youtube_url:yt,description:desc});
+  b.disabled=false;b.textContent=t('btn_upload_video');
+  if(error)sta(rs,t('err_upload'),'err');
+  else{['rNick','rClass','rYt','rDesc'].forEach(id=>document.getElementById(id).value='');sta(rs,t('ok_video'),'ok');}
+});
+function rrk(r,pre=false){const ytId=getYtId(r.youtube_url||'');if(!ytId)return;const c=document.createElement('div');c.className='rank-yt-card';c.innerHTML='<div class="rank-yt-embed"><iframe src="https://www.youtube.com/embed/'+ytId+'" allowfullscreen loading="lazy"></iframe></div><div class="rank-yt-info"><div class="rank-yt-player"><div class="rank-yt-avatar">'+gav(r.nickname)+'</div><div><div class="rank-yt-name">'+esc(r.nickname)+'</div><div class="rank-yt-sub">'+esc(r.class||'Player')+'</div></div></div>'+(r.description?'<div class="rank-yt-desc">'+esc(r.description)+'</div>':'')+'<div class="rank-yt-time">'+tago(r.created_at)+' '+exb(r.created_at,RH)+'</div></div>';if(pre)rc.insertBefore(c,rc.firstChild);else rc.appendChild(c);}
+async function loadRankings(){const{data,error}=await db.from('rankings').select('*').gt('created_at',new Date(Date.now()-RH*3600000).toISOString()).order('created_at',{ascending:false}).limit(20);rc.innerHTML='';if(error||!data||!data.length){rc.innerHTML='<div class="empty-state"><span class="empty-icon">🏆</span><span class="empty-text">'+t('no_videos')+'</span></div>';return;}data.forEach(r=>rrk(r));}
+db.channel('rnk').on('postgres_changes',{event:'INSERT',schema:'public',table:'rankings'},p=>{const e=rc.querySelector('.empty-state');if(e)e.remove();rrk(p.new,true);}).subscribe();
+loadRankings();
+
+// SELLERS
+const sl=document.getElementById('sellersList'),ss=document.getElementById('sStatus');
+document.getElementById('sPublishBtn').addEventListener('click',async()=>{
+  const nick=document.getElementById('sNick').value.trim(),trades=document.getElementById('sTrades').value.trim(),rating=document.getElementById('sRating').value.trim(),desc=document.getElementById('sDesc').value.trim();
+  if(!nick||!trades||!rating){sta(ss,t('err_seller_fill'),'err');return;}
+  const b=document.getElementById('sPublishBtn');b.disabled=true;b.textContent='...';
+  const{error}=await db.from('sellers').insert({nickname:nick,trades,rating,description:desc});
+  b.disabled=false;b.textContent=t('btn_register');
+  if(error)sta(ss,t('err_register'),'err');
+  else{['sNick','sTrades','sRating','sDesc'].forEach(id=>document.getElementById(id).value='');sta(ss,t('ok_seller'),'ok');}
+});
+function rsl(s,pre=false){const c=document.createElement('div');c.className='seller-card';c.innerHTML='<div class="seller-card-top"><div class="seller-avatar">'+gav(s.nickname)+'</div><div><div class="seller-card-name">'+esc(s.nickname)+' '+exb(s.created_at,SH)+'</div><div class="seller-card-stats"><span class="seller-stat-pill trades">'+esc(s.trades)+' trades</span><span class="seller-stat-pill rating">'+esc(s.rating)+'</span></div></div></div><div class="seller-card-desc">'+esc(s.description)+'</div>';if(pre)sl.insertBefore(c,sl.firstChild);else sl.appendChild(c);}
+async function loadSellers(){const{data,error}=await db.from('sellers').select('*').gt('created_at',new Date(Date.now()-SH*3600000).toISOString()).order('created_at',{ascending:false}).limit(50);sl.innerHTML='';if(error||!data||!data.length){sl.innerHTML='<div class="empty-state"><span class="empty-icon">✅</span><span class="empty-text">'+t('no_sellers')+'</span></div>';return;}data.forEach(s=>rsl(s));}
+db.channel('sel').on('postgres_changes',{event:'INSERT',schema:'public',table:'sellers'},p=>{const e=sl.querySelector('.empty-state');if(e)e.remove();rsl(p.new,true);}).subscribe();
+loadSellers();
+
+// FORO
+const ff=document.getElementById('foroFeed'),fs=document.getElementById('fStatus'),cc=document.getElementById('charCount');
+document.getElementById('fContent').addEventListener('input',function(){cc.textContent=this.value.length+' / 300';});
+document.getElementById('fPublishBtn').addEventListener('click',async()=>{
+  const nick=document.getElementById('fNick').value.trim(),content=document.getElementById('fContent').value.trim();
+  if(!nick){sta(fs,t('err_nick'),'err');return;}
+  if(!content){sta(fs,t('err_content'),'err');return;}
+  const b=document.getElementById('fPublishBtn');b.disabled=true;b.textContent='...';
+  const{error}=await db.from('post').insert({nickname:nick,content});
+  b.disabled=false;b.textContent=t('btn_publish');
+  if(error)sta(fs,t('err_publish'),'err');
+  else{document.getElementById('fContent').value='';cc.textContent='0 / 300';sta(fs,t('ok_post'),'ok');}
+});
+function rpst(p,pre=false){const c=document.createElement('div');c.className='post-card';c.innerHTML='<div class="post-top"><div class="post-avatar">'+gav(p.nickname)+'</div><div class="post-nick">'+esc(p.nickname)+'</div><div class="post-time">'+tago(p.created_at)+' '+exb(p.created_at,FH)+'</div></div><div class="post-content">'+esc(p.content)+'</div>';if(pre)ff.insertBefore(c,ff.firstChild);else ff.appendChild(c);}
+async function loadForo(){const{data,error}=await db.from('post').select('*').gt('created_at',new Date(Date.now()-FH*3600000).toISOString()).order('created_at',{ascending:false}).limit(50);ff.innerHTML='';if(error||!data||!data.length){ff.innerHTML='<div class="empty-state"><span class="empty-icon">💬</span><span class="empty-text">'+t('no_posts')+'</span></div>';return;}data.forEach(p=>rpst(p));}
+db.channel('fro').on('postgres_changes',{event:'INSERT',schema:'public',table:'post'},p=>{const e=ff.querySelector('.empty-state');if(e)e.remove();rpst(p.new,true);}).subscribe();
+loadForo();
+</script>
+</body>
+</html>
