@@ -11,6 +11,7 @@
   --text-main: #f3effa;
   --text-muted: #a395b8;
   --accent-gold: #ffd700;
+  --sidebar-width: 240px;
 }
 
 * {
@@ -25,6 +26,7 @@ body {
   font-family: 'Rajdhani', sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
+  padding-top: 80px; /* Espacio para la barra superior fija */
 }
 
 /* ==========================================================================
@@ -37,22 +39,21 @@ body {
   width: 100vw;
   height: 100vh;
   background-image: 
-    linear-gradient(rgba(189, 0, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(189, 0, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(189, 0, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(189, 0, 255, 0.02) 1px, transparent 1px);
   background-size: 40px 40px;
   z-index: -3;
 }
 
 .bg-glow {
   position: fixed;
-  top: -20%;
-  left: 25%;
+  top: -10%;
+  left: 30%;
   width: 50vw;
   height: 50vh;
-  background: radial-gradient(circle, rgba(189, 0, 255, 0.15) 0%, transparent 70%);
-  filter: blur(80px);
+  background: radial-gradient(circle, rgba(189, 0, 255, 0.12) 0%, transparent 70%);
+  filter: blur(90px);
   z-index: -2;
-  animation: pulseGlow 8s ease-in-out infinite alternate;
 }
 
 .bg-particles {
@@ -65,57 +66,179 @@ body {
   z-index: -1;
 }
 
-@keyframes pulseGlow {
-  0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
-  100% { transform: scale(1.2) translate(5%, 5%); opacity: 1; }
-}
-
-/* Destello de pantalla opcional para eventos de la interfaz */
-#flash-overlay {
+/* ==========================================================================
+   BARRA SUPERIOR (TOP BAR)
+   ========================================================================== */
+.top-bar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #ffffff;
+  width: 100%;
+  height: 70px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1100;
+  background: rgba(10, 5, 22, 0.75) !important;
+  border-radius: 0 !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.header-titles {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.brand-title-small {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  color: #ffffff;
+  text-shadow: 0 0 12px var(--primary-glow);
+}
+
+.brand-subtitle-small {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--secondary-glow);
+  letter-spacing: 4px;
+  margin-top: -2px;
+}
+
+/* Botón de Hamburguesa Avanzado (3 líneas) */
+.menu-btn {
+  background: none;
+  border: none;
+  width: 30px;
+  height: 24px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1200;
+}
+
+.menu-btn span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: var(--text-main);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+}
+
+/* Animación al abrir menú */
+.menu-btn.active span:nth-child(1) {
+  transform: translateY(10px) rotate(45deg);
+  background-color: var(--secondary-glow);
+}
+
+.menu-btn.active span:nth-child(2) {
   opacity: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transition: opacity 0.4s ease;
+}
+
+.menu-btn.active span:nth-child(3) {
+  transform: translateY(-11px) rotate(-45deg);
+  background-color: var(--secondary-glow);
 }
 
 /* ==========================================================================
-   ESTRUCTURA PRINCIPAL Y PANELES
+   MENÚ LATERAL DE NAVEGACIÓN (SIDEBAR)
    ========================================================================== */
-.main-container {
+.side-nav {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: var(--sidebar-width);
+  height: calc(100vh - 70px);
+  z-index: 1050;
+  background: rgba(8, 4, 18, 0.9);
+  border-radius: 0 !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: 1px solid var(--panel-border);
+  transition: transform 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  padding: 30px 15px;
+}
+
+.side-nav.hidden {
+  transform: translateX(-100%);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.nav-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  color: #fff;
+  background: rgba(189, 0, 255, 0.08);
+  border-color: rgba(189, 0, 255, 0.2);
+  padding-left: 25px;
+}
+
+.nav-btn.active {
+  color: #ffffff;
+  background: linear-gradient(90deg, rgba(189, 0, 255, 0.25) 0%, transparent 100%);
+  border-left: 3px solid var(--secondary-glow);
+  box-shadow: inset 4px 0 10px rgba(0, 243, 255, 0.05);
+}
+
+/* ==========================================================================
+   CONTENEDOR PRINCIPAL Y SECCIONES
+   ========================================================================== */
+.main-content {
   max-width: 900px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 30px 20px;
+  transition: opacity 0.3s ease;
 }
 
-.hub-header {
-  text-align: center;
-  margin-bottom: 50px;
+.content-section {
+  display: flex;
+  flex-direction: column;
 }
 
-.brand-title {
-  font-family: 'Cinzel Decorative', serif;
-  font-weight: 900;
-  font-size: 3rem;
-  letter-spacing: 4px;
-  color: #ffffff;
-  text-shadow: 0 0 20px var(--primary-glow), 0 0 40px rgba(189, 0, 255, 0.5);
+.content-section.hidden {
+  display: none;
 }
 
-.brand-subtitle {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 1.1rem;
-  color: var(--secondary-glow);
-  letter-spacing: 6px;
-  margin-top: 10px;
+.active-section {
+  animation: sectionFadeIn 0.4s ease forwards;
 }
 
-/* Efecto de Cristal para los Paneles */
+@keyframes sectionFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Panel de Efecto Cristal (Glassmorphism) */
 .glass-panel {
   background: var(--panel-bg);
   backdrop-filter: blur(12px);
@@ -123,33 +246,39 @@ body {
   border: 1px solid var(--panel-border);
   border-radius: 12px;
   padding: 25px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-panel:hover {
-  border-color: var(--panel-border-hover);
-  box-shadow: 0 8px 32px 0 rgba(0, 243, 255, 0.1);
+  border-color: rgba(189, 0, 255, 0.4);
 }
 
 .panel-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 600;
-  font-size: 1.4rem;
+  font-weight: 700;
+  font-size: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   color: var(--secondary-glow);
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+/* Controles del Market */
+.market-controls {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 /* ==========================================================================
-   ELEMENTOS DE FORMULARIO Y BOTONES
+   INPUTS, TEXTAREAS Y BOTONES
    ========================================================================== */
 textarea {
   width: 100%;
-  height: 110px;
-  background: rgba(10, 5, 20, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 120px;
+  background: rgba(8, 4, 18, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 15px;
   color: var(--text-main);
@@ -157,11 +286,12 @@ textarea {
   font-size: 1.1rem;
   resize: none;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 textarea:focus {
   border-color: var(--secondary-glow);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
 }
 
 .panel-footer {
@@ -184,62 +314,47 @@ textarea:focus {
   color: #ffffff;
   font-family: 'Rajdhani', sans-serif;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  padding: 10px 25px;
+  letter-spacing: 1.5px;
+  padding: 10px 22px;
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(189, 0, 255, 0.4);
+  box-shadow: 0 0 15px rgba(189, 0, 255, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
-  filter: brightness(1.2);
+  box-shadow: 0 0 22px rgba(0, 243, 255, 0.5);
+  filter: brightness(1.15);
 }
-
-.btn-primary:disabled {
-  background: #332742;
-  box-shadow: none;
-  cursor: not-allowed;
-  color: var(--text-muted);
-}
-
-/* Mensajes de Estado */
-.status-message {
-  font-size: 1rem;
-  margin-bottom: 10px;
-  font-family: 'Share Tech Mono', monospace;
-}
-.status-message.err { color: #ff4a4a; }
-.status-message.ok { color: #4eff4a; }
 
 /* ==========================================================================
-   ESTILOS DE LAS TARJETAS DEL FORO (POSTS)
+   TARJETAS DE CONTENIDO DINÁMICO (POSTS / ITEMS)
    ========================================================================== */
 .posts-container {
-  margin-top: 30px;
+  margin-top: 25px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
 .post-card {
-  background: rgba(20, 12, 36, 0.5);
+  background: rgba(16, 9, 30, 0.45);
   border-left: 4px solid var(--primary-glow);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 0 8px 8px 0;
   padding: 20px;
-  backdrop-filter: blur(8px);
-  transition: border-left-color 0.3s ease, transform 0.3s ease;
-  animation: fadeInPost 0.4s ease forwards;
+  backdrop-filter: blur(6px);
+  transition: border-left-color 0.3s ease, transform 0.2s ease, background 0.3s ease;
+  animation: cardEntry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .post-card:hover {
   border-left-color: var(--secondary-glow);
+  background: rgba(22, 12, 40, 0.6);
   transform: translateX(4px);
 }
 
@@ -251,17 +366,17 @@ textarea:focus {
 }
 
 .post-avatar {
-  width: 36px;
-  height: 36px;
-  background: var(--primary-glow);
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, var(--primary-glow), #4b0082);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #fff;
-  box-shadow: 0 0 10px rgba(189, 0, 255, 0.5);
+  box-shadow: 0 0 8px var(--primary-glow);
 }
 
 .post-nick {
@@ -278,39 +393,45 @@ textarea:focus {
 }
 
 .post-content {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-@keyframes fadeInPost {
-  from { opacity: 0; transform: translateY(15px); }
+@keyframes cardEntry {
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Mensajes de feedback técnico */
+.status-message {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+.status-message.err { color: #ff5555; }
+.status-message.ok { color: #55ff55; }
+.text-muted { color: var(--text-muted); }
+
 /* ==========================================================================
-   SELECTOR DE IDIOMA FLOTANTE
+   SELECTOR DE IDIOMA (TOP BAR INLINE)
    ========================================================================== */
-.lang-selector {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
+.lang-selector-inline {
+  position: relative;
 }
 
 .lang-toggle {
-  background: rgba(20, 12, 36, 0.8);
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
+  background: rgba(25, 15, 45, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
   color: var(--text-main);
-  padding: 8px 14px;
+  padding: 6px 12px;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  backdrop-filter: blur(8px);
+  gap: 6px;
   transition: border-color 0.3s;
 }
 
@@ -320,29 +441,28 @@ textarea:focus {
 
 .lang-dropdown {
   position: absolute;
-  top: 110%;
+  top: 120%;
   right: 0;
-  background: rgba(12, 6, 22, 0.95);
+  background: rgba(14, 8, 26, 0.95);
   border: 1px solid var(--panel-border-hover);
-  border-radius: 8px;
-  width: 110px;
+  border-radius: 6px;
+  width: 100px;
   display: none;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
 
 .lang-dropdown.show {
   display: flex;
-  animation: dropdownFade 0.2s ease;
 }
 
 .lang-option {
-  padding: 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-align: center;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s;
 }
 
 .lang-option:hover {
@@ -350,7 +470,21 @@ textarea:focus {
   color: #fff;
 }
 
-@keyframes dropdownFade {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ==========================================================================
+   RESPONSIVO / COMPATIBILIDAD MÓVIL
+   ========================================================================== */
+@media (max-width: 768px) {
+  body {
+    padding-top: 75px;
+  }
+  .brand-title-small {
+    font-size: 1.3rem;
+  }
+  .side-nav {
+    width: 100%; /* El menú móvil ocupa todo el ancho */
+    height: calc(100vh - 70px);
+  }
+  .main-content {
+    padding: 15px 12px;
+  }
 }
